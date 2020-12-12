@@ -1,0 +1,9 @@
+/*
+|--------------------------------------------------------------------------
+| Post css file
+|--------------------------------------------------------------------------
+| This file will be processed before start, add any style or css file here
+|
+*/
+
+@import "tailwind.css";

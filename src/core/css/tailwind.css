@@ -1,0 +1,12 @@
+/*
+|--------------------------------------------------------------------------
+| Tailwind css imports
+|--------------------------------------------------------------------------
+| Add tailwind components here.
+|
+*/
+
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
