@@ -1,54 +1,37 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import './core/css/main.css'
-import {DARK_THEME, DEFAULT_THEME} from "./core/theme";
-import {applyTheme} from "./core/theme/utils";
-import Player from "./core/components/home/Player";
-import Api from "./core/api/Api";
+import {DARK_THEME, DEFAULT_THEME, useTheme} from "./core/theme";
+import AppRouter from "./core/components/router/AppRouter";
+import {useAuth} from "./core/components/auth/provider/AuthProvider";
+import {useCookies} from "react-cookie";
+
 
 function App() {
 
-    const [theme, setTheme] = useState(DEFAULT_THEME)
+    const auth = useAuth()
+    const theme = useTheme()
 
-    const login = (event: React.MouseEvent) => {
-        event.preventDefault()
-        Api.auth.login({
-            email: 'abby45@example.com',
-            password: 'password',
-            'remember_me': false
-        }).then(resp => {
-            console.log(resp)
-        }).catch(e => {
-            console.log(e.response)
-        })
-    }
+    const [cookie, setCookie, removeCookie] = useCookies()
 
-    const user = (event: React.MouseEvent) => {
-        event.preventDefault()
-        Api.auth.profile()
-            .then(resp => {
-                console.log(resp)
-            })
-            .catch(e => {
-                console.log(e.response)
-            })
-    }
+    auth.user.isLogin = cookie['XSRF-TOKEN'] !== undefined
 
-    const switchTheme = (event: React.MouseEvent) => {
-        event.preventDefault()
-        setTheme(DARK_THEME === theme ? DEFAULT_THEME : DARK_THEME)
-    }
-
+    // one time update
     useEffect(() => {
-        applyTheme(theme)
-    }, [theme])
+        if (cookie['theme'] === undefined)
+            setCookie('theme', DEFAULT_THEME)
+
+        theme.name = cookie['theme']
+
+        // did mount
+        theme.switchTheme(theme.name)
+        // did unmount
+        return () => {
+
+        }
+    })
 
     return (
-        <div>
-            <button onClick={login}>Login</button>
-            <button onClick={user}>Profile</button>
-            <button onClick={switchTheme}>Switch Theme</button>
-            <Player time={1}/>
-        </div>
+            <AppRouter/>
     );
 }
 
