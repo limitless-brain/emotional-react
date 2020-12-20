@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import ReactPlayer from "react-player";
 import {usePlayer} from "./provider/PlayerProvider";
 import Duration from "./components/Duration";
-import {Slider} from "@material-ui/core";
+import {makeStyles, Slider} from "@material-ui/core";
+import {useNotification} from "../notification/provider/NotificationProvider";
 
 const PlayerControl: React.FC = () => {
 
@@ -15,7 +16,7 @@ const PlayerControl: React.FC = () => {
                 <i className="fa fa-backward"/>
             </button>
             <button
-                onClick={()=>{
+                onClick={() => {
                     player.handlePlayPause()
                 }}
                 className="h-12 w-12 outline-none focus:outline-none text-text-primary shadow transform hover:bg-primary transition-all duration-500">
@@ -35,12 +36,51 @@ function Player() {
 
     const [showVideo, setShowVideo] = useState(false)
 
+    const [progress, setProgress] = useState<number | number[]>(0)
+
+    const [isDragging, setIsDragging] = useState(false)
+
+    const nProvider = useNotification()
+
+    const useStyles = makeStyles({
+        root: {
+            height: 2,
+        },
+        label: {
+            textTransform: 'capitalize',
+        },
+    })
+
+    const classes = useStyles()
+
+    const handleOnChangeCommitted = (event: any, newValue: number | number[]) => {
+        setProgress(newValue)
+        player.player?.seekTo(progress as number)
+        setIsDragging(false)
+    }
+
+    useEffect(() => {
+        if (!isDragging) {
+            setProgress(player.progress.playedSeconds)
+        }
+    }, [isDragging, player.progress.playedSeconds])
+
     return (
         <div
             className="w-full fixed flex flex-row justify-between items-center h-12 bottom-0 bg-bg-secondary rounded-t-2xl shadow-inverse transition-all duration-500">
             <PlayerControl/>
-            <div className="flex flex-grow justify-center items-center mx-8">
-                <Slider/>
+            <div className="flex flex-grow h-12 space-x-2 md:space-x-8 justify-center items-center mx-2 md:mx-8">
+                <Duration seconds={player.progress.playedSeconds}/>
+                <Slider
+                    classes={{
+                        root: classes.root
+                    }}
+                    onMouseDown={() => setIsDragging(true)}
+                    onChange={handleOnChangeCommitted}
+                    value={progress}
+                    min={0}
+                    max={player.state.duration}/>
+                <Duration seconds={player.state.duration}/>
             </div>
             <div className="flex flex-row justify-center items-center">
                 <button
@@ -81,7 +121,14 @@ function Player() {
                     }}
                     onSeek={e => console.log('onSeek', e)}
                     onEnded={player.handleEnded}
-                    onError={e => console.log('onError', e)}
+                    onError={e => {
+                        if (e === 150) {
+                            nProvider.notify({
+                                message: "Can't play the video, it's playable from youtube only.",
+                                severity: "warning"
+                            })
+                        }
+                    }}
                     onProgress={player.handleProgress}
                     onDuration={player.handleDuration}
                     config={{

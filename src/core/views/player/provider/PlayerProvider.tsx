@@ -17,7 +17,7 @@ interface IPlayerProvider {
     handleDuration: (duration: number) => void,
     handleClickFullscreen: Function,
     handleEnded: () => void,
-    handleSeekChange: Function,
+    handleSeekChange: (newValue: number) => void,
     handleSeekMouseDown: Function,
     handleSeekMouseUp: Function,
     handleProgress: (state: IProgressState) => void,
@@ -70,7 +70,9 @@ function usePlayerProvider() {
 
     const [state, setState] = useState(DEFAULT_STATE)
 
-    const [progress, setProgress] = useState({} as IProgressState)
+    const [progress, setProgress] = useState({
+        playedSeconds:0
+    } as IProgressState)
 
     const [refresh, setRefresh] = useState(false)
 
@@ -175,15 +177,15 @@ function usePlayerProvider() {
         setRefresh(!refresh)
     }
 
-    const handleSeekChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        progress.played = parseFloat(event.target.value)
+    const handleSeekChange = (newValue: number) => {
+        progress.played = newValue
         setState(state)
         setRefresh(!refresh)
     }
 
-    const handleSeekMouseUp = (event: React.MouseEvent) => {
+    const handleSeekMouseUp = (value: number) => {
         state.seeking = false
-        player!.seekTo(parseFloat((event.target as HTMLInputElement).value))
+        player!.seekTo(value)
         setState(state)
         setRefresh(!refresh)
     }
