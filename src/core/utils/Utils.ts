@@ -22,13 +22,32 @@ export function handleInputOnCheck(event: React.ChangeEvent<HTMLInputElement>, o
 }
 
 export function toRad(a: Number): Number {
-    return (a.valueOf() * Math.PI)/180
+    return (a.valueOf() * Math.PI) / 180
 }
 
-export function getCircumferenceX(rad: Number,theta: Number): Number {
+export function getCircumferenceX(rad: Number, theta: Number): Number {
     return rad.valueOf() * Math.cos(theta.valueOf())
 }
 
-export function getCircumferenceY(rad: Number,theta: Number): Number {
+export function getCircumferenceY(rad: Number, theta: Number): Number {
     return rad.valueOf() * Math.sin(theta.valueOf())
+}
+
+export function getYoutubeVideoId(url: string): string {
+    return url.substring(url.indexOf('=') + 1)
+}
+
+export function format(seconds: number): string {
+
+    const date = new Date(seconds * 1000)
+
+    const hh = date.getUTCHours()
+    const mm = date.getUTCMinutes().toString().padStart(2,'0')
+    const ss = date.getUTCSeconds().toString().padStart(2,'0')
+
+    if (hh) {
+        return `${hh.toString().padStart(2,'0')}:${mm}:${ss}`
+    }
+
+    return `${mm}:${ss}`
 }

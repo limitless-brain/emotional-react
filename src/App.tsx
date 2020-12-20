@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
 import './core/css/main.css'
 import {DARK_THEME, DEFAULT_THEME, useTheme} from "./core/theme";
-import AppRouter from "./core/components/router/AppRouter";
-import {useAuth} from "./core/components/auth/provider/AuthProvider";
+import AppRouter from "./core/views/router/AppRouter";
+import {useAuth} from "./core/views/auth/provider/AuthProvider";
 import {useCookies} from "react-cookie";
 
 
