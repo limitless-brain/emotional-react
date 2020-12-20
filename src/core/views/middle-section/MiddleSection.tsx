@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import Api from "../../api/Api";
 import {usePlayer} from "../player/provider/PlayerProvider";
 import {getYoutubeVideoId} from "../../utils/Utils";
+import {useNotification} from "../notification/provider/NotificationProvider";
 
 interface ISong {
     key: string | number,
@@ -121,6 +122,8 @@ const SongItem: React.FC<ISong> = (props) => {
 
 function MiddleSection() {
 
+    const nProvider = useNotification()
+
     const [elements, setElements] = useState([])
 
     const [refresh, setRefresh] = useState(false)
@@ -129,7 +132,6 @@ function MiddleSection() {
 
         await Api.youtube.featured().then(resp => {
             let videos: Array<IYoutubeVideo> = JSON.parse(resp.data).items
-            console.log(videos)
             let songItems: any = []
             videos.forEach(video => {
                 songItems.push(<SongItem key={video.id}

@@ -22,9 +22,21 @@ function Notification() {
     }
 
     useEffect(() => {
-        if (nProvider.notification.message)
+        if (nProvider.notification.message) {
             setOpen(true)
-    }, [nProvider.refresh])
+        }
+    }, [nProvider.notification.message, nProvider.refresh])
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout | undefined
+        if (!open) {
+            timeout = setTimeout(() => nProvider.setIsShowing(false), 500)
+        }
+        return () => {
+            clearTimeout(timeout!)
+        }
+    }, [nProvider, open])
+
 
     return (
         <Snackbar open={open} autoHideDuration={3000} onClose={handleClose}>
