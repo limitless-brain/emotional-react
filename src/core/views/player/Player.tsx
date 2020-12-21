@@ -36,34 +36,15 @@ function Player() {
 
     const [showVideo, setShowVideo] = useState(false)
 
-    const [progress, setProgress] = useState<number | number[]>(0)
-
-    const [isDragging, setIsDragging] = useState(false)
-
     const nProvider = useNotification()
 
     const useStyles = makeStyles({
         root: {
             height: 2,
         },
-        label: {
-            textTransform: 'capitalize',
-        },
     })
 
     const classes = useStyles()
-
-    const handleOnChangeCommitted = (event: any, newValue: number | number[]) => {
-        setProgress(newValue)
-        player.player?.seekTo(progress as number)
-        setIsDragging(false)
-    }
-
-    useEffect(() => {
-        if (!isDragging) {
-            setProgress(player.progress.playedSeconds)
-        }
-    }, [isDragging, player.progress.playedSeconds])
 
     return (
         <div
@@ -75,9 +56,10 @@ function Player() {
                     classes={{
                         root: classes.root
                     }}
-                    onMouseDown={() => setIsDragging(true)}
-                    onChange={handleOnChangeCommitted}
-                    value={progress}
+                    onMouseDown={player.handleSeekMouseDown}
+                    onChange={player.handleSeekChange}
+                    onMouseUp={player.handleSeekMouseUp}
+                    value={player.progress.playedSeconds}
                     min={0}
                     max={player.state.duration}/>
                 <Duration seconds={player.state.duration}/>
@@ -92,9 +74,7 @@ function Player() {
             <div
                 className={`absolute ${!showVideo ? 'hidden' : ''} w-96 h-96 bottom-14 right-2 transition-all duration-500`}>
                 <ReactPlayer
-                    ref={(p) => {
-                        player.player = p
-                    }}
+                    ref={player.setPlayer}
                     playing={player.state.playing}
                     width="100%"
                     height="100%"

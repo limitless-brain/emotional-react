@@ -1,34 +1,41 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useRef, useState} from 'react';
 import ReactPlayer from "react-player";
 
-
+/**
+ * Player provider blueprint
+ *
+ */
 interface IPlayerProvider {
     state: IPlayerState,
     progress: IProgressState,
-    player: ReactPlayer | null,
+    setPlayer: (player: ReactPlayer | null) => void,
     load: (url: string) => void,
     handlePlayPause: () => void,
     handlePlay: () => void,
     handlePause: () => void,
     handleStop: () => void,
-    handleTogglePip: Function,
+    handleTogglePip: () => void,
     handleEnablePip: () => void,
     handleDisablePip: () => void,
     handleDuration: (duration: number) => void,
-    handleClickFullscreen: Function,
+    handleClickFullscreen: () => void,
     handleEnded: () => void,
-    handleSeekChange: (newValue: number) => void,
-    handleSeekMouseDown: Function,
-    handleSeekMouseUp: Function,
+    handleSeekChange: (event: any, newValue: (number | number[])) => void,
+    handleSeekMouseDown: (event: any) => void,
+    handleSeekMouseUp: (event: any) => void,
     handleProgress: (state: IProgressState) => void,
-    handleSetPlaybackRate: Function,
-    handleToggleControls: Function,
-    handleToggleLoop: Function,
-    handleToggleMuted: Function,
-    handleToggleLight: Function,
-    handleVolumeChange: Function
+    handleSetPlaybackRate: (rate: '0.5' | '1.0' | '1.25' | '1.5' | '2.0') => void,
+    handleToggleControls: () => void,
+    handleToggleLoop: () => void,
+    handleToggleMuted: () => void,
+    handleToggleLight: () => void,
+    handleVolumeChange: (event: any, volume: (number | number[])) => void
 }
 
+/**
+ * Player state blueprint
+ *
+ */
 interface IPlayerState {
     url: string,
     pip: boolean,
@@ -43,6 +50,10 @@ interface IPlayerState {
     seeking: boolean
 }
 
+/**
+ * Player Progress blueprint
+ *
+ */
 interface IProgressState {
     played: number,
     playedSeconds: number,
@@ -50,6 +61,10 @@ interface IProgressState {
     loadedSeconds: number
 }
 
+/**
+ * Default player state object
+ *
+ */
 const DEFAULT_STATE: IPlayerState = {
     controls: false,
     duration: 0,
@@ -64,164 +79,349 @@ const DEFAULT_STATE: IPlayerState = {
     seeking: false
 }
 
+/**
+ * Player context that holds player provider state object
+ *
+ */
 const playerContext = createContext({} as IPlayerProvider)
 
+/**
+ * The method that create player provider state object
+ *
+ */
 function usePlayerProvider() {
 
+    // state to hold player state
     const [state, setState] = useState(DEFAULT_STATE)
 
+    // state to hold player progress
     const [progress, setProgress] = useState({
-        playedSeconds:0
+        playedSeconds: 0 // defined to bypass NAN (Not A Number) used in duration display
     } as IProgressState)
 
+    // state to request hierarchy update
     const [refresh, setRefresh] = useState(false)
 
-    let player: ReactPlayer | null = null
+    // player ref to hold {ReactPlayer} component ref
+    const [playerRef, setPlayerRef] = useState<ReactPlayer|null>(null)
 
+    /**
+     * The method that set react player instance
+     * @param _player
+     */
+    const setPlayer = (_player: ReactPlayer | null) => {
+        setPlayerRef(_player)
+    }
+
+    /**
+     * The method that request hierarchy update after storing player state
+     */
+    const update = () => {
+        // store player state
+        setState(state)
+
+        // request hierarchy update
+        setRefresh(!refresh)
+    }
+
+    /**
+     * The method that load a given url in {ReactPlayer}
+     * @param url
+     */
     const load = (url: string) => {
+
+        // update player state
         state.url = url
         state.playing = true
         state.pip = false
 
+        // reset progress
         setProgress({} as IProgressState)
 
-        setState(state)
-
-        setRefresh(!refresh)
+        // update
+        update()
     }
 
+    /**
+     * The method that switch playing state
+     *
+     */
     const handlePlayPause = () => {
+        // switch playing state
         state.playing = !state.playing
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that stop playing
+     */
     const handleStop = () => {
+        // clean url
         state.url = ''
+        // set playing to false
         state.playing = false
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that show/hide controls for the
+     * embedded player
+     *
+     */
     const handleToggleControls = () => {
+        // hold the url
         const url = state.url
+        // toggle controls
         state.controls = !state.controls
+        // clear url
         state.url = ''
+
+        // store player state
         setState(state)
+        // reload the url
         load(url)
     }
 
+    /**
+     * The method that toggle light mode for
+     * the embedded player
+     *
+     */
     const handleToggleLight = () => {
+        // toggle light
         state.light = !state.light
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that toggle loop mode for
+     * the embedded player
+     */
     const handleToggleLoop = () => {
+        // toggle loop
         state.loop = !state.loop
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
-    const handleVolumeChange = (v: number) => {
-        state.volume = (v > 1) ? 1 : (v < 0) ? 0 : v
-        setState(state)
-        setRefresh(!refresh)
+    /**
+     * The method that control volume for the
+     * embedded player
+     * @param event
+     * @param volume new value for the volume
+     */
+    const handleVolumeChange = (event: any, volume: (number | number[])) => {
+        // store volume
+        state.volume = volume as number
+
+        // update
+        update()
     }
 
+    /**
+     * The method that toggle muted for the
+     * embedded player
+     *
+     */
     const handleToggleMuted = () => {
+        // toggle muted
         state.muted = !state.muted
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that toggle PIP(Picture In Picture) mode
+     * for the embedded player
+     *
+     */
     const handleTogglePip = () => {
+        // toggle pip
         state.pip = !state.pip
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
-    const handleSetPlaybackRate = (r: number) => {
-        state.playbackRate = r
-        setState(state)
-        setRefresh(!refresh)
+    /**
+     * The method that set playback rate
+     *
+     * @param rate
+     */
+    const handleSetPlaybackRate = (rate: '0.5' | '1.0' | '1.25' | '1.5' | '2.0') => {
+        // store rate
+        state.playbackRate = parseFloat(rate)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that switch playing state to true
+     *
+     */
     const handlePlay = () => {
+        // set playing to true
         state.playing = true
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that enables PIP mode
+     *
+     */
     const handleEnablePip = () => {
+        // set pip to true
         state.pip = true
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that disable PIP mode
+     *
+     */
     const handleDisablePip = () => {
+        // set pip to false
         state.pip = false
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that switch playing state to false
+     *
+     */
     const handlePause = () => {
+        // set playing to false
         state.playing = false
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
-    const handleSeekMouseDown = (event: React.MouseEvent) => {
+    /**
+     * The method that handle {Slider} mouseDown event
+     *
+     * @param _event is not used, the method blueprint
+     * must be like that to be used directly
+     */
+    const handleSeekMouseDown = (_event: any) => {
+        // set seeking to true
         state.seeking = true
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
-    const handleSeekChange = (newValue: number) => {
-        progress.played = newValue
-        setState(state)
-        setRefresh(!refresh)
-    }
+    /**
+     * The method that handle {Slider} onChange event
+     *
+     * @param event is not used, the method blueprint
+     * must be like that to be used directly
+     *
+     * @param newValue
+     */
+    const handleSeekChange = (event: any, newValue: (number | number[])) => {
+        // store playedSeconds
+        progress.playedSeconds = newValue as number
 
-    const handleSeekMouseUp = (value: number) => {
-        state.seeking = false
-        player!.seekTo(value)
-        setState(state)
-        setRefresh(!refresh)
-    }
-
-    const handleProgress = (s: IProgressState) => {
-        if (!state.seeking)
-            setProgress(s)
-        setRefresh(!refresh)
-    }
-
-    const handleEnded = () => {
-        state.playing = state.loop
-        progress.playedSeconds = state.duration
-        console.log('ended')
-        setState(state)
+        // update
         setProgress(progress)
-        setRefresh(!refresh)
+        update()
     }
 
+    /**
+     * The method that handle
+     * @param _event is not used, the method blueprint
+     * must be like that to be used directly
+     *
+     */
+    const handleSeekMouseUp = (_event: any) => {
+        // if player null, return
+        if(!playerRef)
+            return
+        // set seeking to false
+        state.seeking = false
+        // seek player to the given value
+        playerRef!.seekTo(progress.playedSeconds)
+
+        // update
+        update()
+    }
+
+    /**
+     * The method that handle player progress
+     *
+     * @param progressState
+     */
+    const handleProgress = (progressState: IProgressState) => {
+        // return if we're seeking
+        if (state.seeking)
+            return
+
+        // otherwise store progress
+        setProgress(progressState)
+
+        // update
+        update()
+    }
+
+    /**
+     * The method that handle player ended event
+     */
+    const handleEnded = () => {
+        // set playing to looping state
+        state.playing = state.loop
+        // set duration to track length
+        // to fix {ReactPlayer} problem with
+        // progress
+        progress.playedSeconds = state.duration
+
+        // store progress
+        setProgress(progress)
+
+        // update
+        update()
+    }
+
+    /**
+     * The method that set the duration of the track
+     * @param duration
+     */
     const handleDuration = (duration: number) => {
+        // store duration
         state.duration = duration
-        setState(state)
-        setRefresh(!refresh)
+
+        // update
+        update()
     }
 
+    /**
+     * The method that set the player to fullscreen
+     *
+     */
     const handleClickFullscreen = () => {
-        // todo add full screen functionality
+        // not used for the purpose of the project
     }
 
-    useEffect(() => {
-    },[refresh])
-
+    // return Player provider object
     return {
         state,
         progress,
-        player,
+        setPlayer,
         load,
         handlePlayPause,
         handlePlay,
@@ -246,12 +446,24 @@ function usePlayerProvider() {
     }
 }
 
+/**
+ * The method that provides player hook
+ */
 export function usePlayer() {
     return useContext(playerContext)
 }
 
+/**
+ * Player provider component
+ *
+ * @param children components that are able to consume player hook
+ * @constructor
+ */
 export const PlayerProvider: React.FC = ({children}) => {
+
+    // player provider state object
     const player = usePlayerProvider()
 
+    // return component design
     return (<playerContext.Provider value={player}>{children}</playerContext.Provider>)
 }
