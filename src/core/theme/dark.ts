@@ -1,9 +1,21 @@
 import {extend} from "./utils";
 import base from "./base";
 
+/*
+|--------------------------------------------------------------------------
+| Dark theme
+|--------------------------------------------------------------------------
+| extending dark theme from the base theme
+|
+*/
 
 export default extend(base, {
-    backgroundPrimary: '#151416',
-    backgroundSecondary: '#444444',
-    textPrimary: '#E9F3F1',
+    actionActive: '#424242',
+    actionDisabled: '#303030',
+    actionDisabledBackground: '#303030',
+    backgroundPrimary: '#303030',
+    backgroundSecondary: '#424242',
+    textPrimary: '#fff',
+    textSecondary: '#c1c1c1',
+    textDisabled: '#989898'
 })

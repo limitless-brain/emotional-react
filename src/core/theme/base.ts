@@ -1,15 +1,27 @@
+/*
+|--------------------------------------------------------------------------
+| Base theme
+|--------------------------------------------------------------------------
+| Theme contains all required colors for the ui
+|
+*/
+
 export default {
-    primary: '#f6b345',
-    secondary: '#E75E2F',
-    negative: '#A94E39',
-    positive: '#A3D9B1',
+    primary: '#f9f9f9',
+    primaryLight: '#fcfcfc',
+    primaryDark: '#c6c6c6',
+    secondary: '#f6b245',
+    secondaryLight: '#ffe475',
+    secondaryDark: '#bf830c',
     textPrimary: '#202020',
-    textSecondary: '#737373',
+    textSecondary: '#101010',
     textDisable: '#9b9b9b',
-    actionActive: '#f6f9fc',
+    actionActive: '#f9f9f9',
     actionHover: '#f6b345',
-    actionSelected: '#f6ad37',
-    actionDisable: '#ddecfc',
+    actionSelected: '#f6b345',
+    actionDisable: '#b9b9b9',
+    actionDisableBackground: '#dcdcdc',
     backgroundPrimary: '#e9f3f1',
-    backgroundSecondary: '#f6f9fc',
+    backgroundSecondary: '#f9f9f9',
+    divider: '#494949'
 }

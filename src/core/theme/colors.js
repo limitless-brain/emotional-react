@@ -6,8 +6,6 @@
 |
 */
 
-const colors = require('tailwindcss/colors')
-
 module.exports = {
     neutral: '#e6e6fa',
     ambiguous: '#fffafa',

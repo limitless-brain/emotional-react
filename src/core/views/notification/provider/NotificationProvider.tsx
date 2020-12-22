@@ -5,7 +5,7 @@ interface INotificationContext {
     isShowing: boolean
     setIsShowing: (show: boolean) => void
     notification: INotificationState,
-    notify: (notification: INotificationState) => void
+    notify: (message: string, severity: "success" | "info" | "warning" | "error" | undefined) => void
 }
 
 interface INotificationState {
@@ -23,18 +23,21 @@ function useNotificationProvider() {
 
     const [notifications, setNotifications] = useState([] as Array<INotificationState>)
 
-    const notify = (notification: INotificationState) => {
-        notifications.push(notification)
+    const notify = (message: string, severity: "success" | "info" | "warning" | "error" | undefined) => {
+        notifications.push({
+            message,
+            severity
+        })
         setNotifications([...notifications])
     }
 
     useEffect(() => {
-        if(!isShowing && notifications.length > 0) {
+        if (!isShowing && notifications.length > 0) {
             setNotification(notifications.shift()!)
             setIsShowing(true)
             setRefresh(!refresh)
         }
-    },[isShowing, notifications, refresh])
+    }, [isShowing, notifications, refresh])
 
     return {
         isShowing,

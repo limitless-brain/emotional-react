@@ -9,9 +9,6 @@ const Header: React.FC = (props) => {
     const [cookie, setCookie, removeCookie] = useCookies()
 
     const switchTheme = (event: React.MouseEvent) => {
-        (event.target as HTMLButtonElement).animate([
-
-        ])
         theme.name = DARK_THEME === theme.name ? DEFAULT_THEME : DARK_THEME
         setCookie('theme', theme.name)
         theme.switchTheme(theme.name)

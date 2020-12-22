@@ -1,4 +1,5 @@
 import React from "react";
+import {makeStyles} from "@material-ui/core";
 
 /**
  * the method that handle change event for html input
@@ -50,4 +51,44 @@ export function format(seconds: number): string {
     }
 
     return `${mm}:${ss}`
+}
+
+/**
+ * Default tailwind button style
+ */
+export const BUTTON_TAILWIND_STYLE = "h-12 w-12 outline-none focus:outline-none bg-action-active hover:bg-action-hover text-text-primary shadow transition-all duration-500"
+
+/**
+ * Default style for slider
+ *
+ */
+export const sliderUseStyles = makeStyles({
+    root: {
+        color: 'var(--color-text-primary)'
+    },
+})
+
+/**
+ * Default style for paper
+ *
+ */
+export const paperUseStyles = makeStyles({
+    root: {
+        'background-color': 'var(--color-bg-secondary)',
+    },
+})
+
+/**
+ * Volume style for slider
+ *
+ */
+export const volumeSliderUseStyles = makeStyles({
+    root: {
+        color: 'var(--color-text-primary)',
+        width: 'w-12'
+    },
+})
+
+export function isEmpty(str: string): boolean {
+    return (!str || 0 === str.length)
 }

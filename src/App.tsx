@@ -17,17 +17,15 @@ function App() {
 
     // one time update
     useEffect(() => {
-        if (cookie['theme'] === undefined)
+        // check if theme is initialized before
+        if (typeof cookie['theme'] === "undefined") {
+            // initialize base theme
+            theme.name = DEFAULT_THEME
             setCookie('theme', DEFAULT_THEME)
-
-        theme.name = cookie['theme']
-
-        // did mount
-        theme.switchTheme(theme.name)
-        // did unmount
-        return () => {
-
         }
+
+        // switch theme
+        theme.switchTheme(theme.name)
     })
 
     return (

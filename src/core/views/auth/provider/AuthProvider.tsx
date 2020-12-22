@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import Api from "../../../api/Api";
-import {AxiosPromise, AxiosResponse} from "axios";
+import {AxiosResponse} from "axios";
 import {useNotification} from "../../notification/provider/NotificationProvider";
 
 export interface ISignUpCred {
@@ -43,17 +43,13 @@ function useAuthProvider() {
         return await Api.auth.signup(credentials)
             .then(resp => {
                 user.isSignUp = true
-                nProvider.notify({
-                    message: "Successfully signed up.", severity: "success"
-                })
+                nProvider.notify("Successfully signed up.", "success")
                 return resp
             })
             .catch(e => {
                 user.isSignUp = false
                 user.error = e.response.data
-                nProvider.notify({
-                    message: e.response.data.message, severity: "error"
-                })
+                nProvider.notify(e.response.data.message, "error")
                 return e
             })
             .finally(() => {
@@ -73,14 +69,10 @@ function useAuthProvider() {
                 user.isLogin = false
                 if (!e.response) {
                     user.error = 'Network Error'
-                    nProvider.notify({
-                        message: user.error, severity: "error"
-                    })
+                    nProvider.notify(user.error, "error")
                 } else {
                     user.error = e.response.data.message;
-                    nProvider.notify({
-                        message: user.error, severity: "error"
-                    })
+                    nProvider.notify(user.error, "error")
                 }
                 return e
             })
@@ -94,17 +86,13 @@ function useAuthProvider() {
             .then(resp => {
                 console.log(resp.data)
                 user.profile = resp.data
-                nProvider.notify({
-                    message: `Hello, ${user.profile.name}`, severity: "info"
-                })
+                nProvider.notify(`Hello, ${user.profile.name}`, "info")
                 return resp
             })
             .catch(e => {
                 console.log(e.response)
                 user.error = e.response.data
-                nProvider.notify({
-                    message: user.error, severity: "error"
-                })
+                nProvider.notify(user.error, "error")
                 return e
             })
             .finally(() => {
@@ -121,9 +109,7 @@ function useAuthProvider() {
             })
             .catch(e => {
                 console.log(e.response.data)
-                nProvider.notify({
-                    message: user.error, severity: "error"
-                })
+                nProvider.notify(user.error, "error")
                 return e
             })
             .finally(() => {
