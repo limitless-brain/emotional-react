@@ -18,7 +18,7 @@ function Login() {
 
     const auth = useAuth()
 
-    const login = (event: React.MouseEvent) => {
+    const login = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
 
         auth.login(cred).then(resp => {
@@ -34,20 +34,20 @@ function Login() {
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => handleInputOnChange(event, cred, setCred)
 
     return (
-        <div className="h-screen flex flex-row space-x-12 bg-bg-secondary justify-center items-center">
-            <img className="hidden md:block" src={loginPng}/>
+        <div className="h-screen flex flex-col md:flex-row bg-bg-secondary justify-center items-center">
+            <img className="h-96" src={loginPng}/>
 
-            <div className="flex flex-col justify-center space-y-4 items-center">
+            <div className="flex flex-col justify-center mx-6 space-y-4 items-center">
                 <h1
                     className="select-none text-text-primary font-medium text-3xl">Emotional</h1>
-                <form className="flex flex-col items-end shadow-around rounded-2xl">
+                <form className="flex flex-col items-end shadow-around rounded-2xl" onSubmit={login}>
                     <div className="flex flex-row shadow rounded-t-2xl">
                         <div className="p-4 w-12">
                             <span className="fa fa-user text-text-primary"/>
                         </div>
                         <input
                             className="w-full text-xl font-normal focus:outline-none focus:bg-bg-primary bg-transparent px-4"
-                            name="email" placeholder="Email" onChange={onChange}/>
+                            name="email" placeholder="Email" onChange={onChange} required/>
                         <div
                             className="p-4 w-12 rounded-tr-2xl shadow">
                             <span className="fa fa-check text-text-primary"/>
@@ -60,7 +60,7 @@ function Login() {
                         <input type={!showPassword ? "password" : "text"}
                                className="w-full text-xl font-normal focus:outline-none focus:bg-bg-primary bg-transparent px-4"
                                name="password" placeholder="Password"
-                               onChange={onChange}/>
+                               onChange={onChange} required/>
                         <div
                             onClick={() => setShowPassword(!showPassword)}
                             className="p-4 w-12 shadow hover:bg-primary focus:bg-primary cursor-pointer">
@@ -88,7 +88,7 @@ function Login() {
                     </div>
                     <button
                         className="w-full p-4 focus:outline-none hover:bg-primary focus:bg-primary text-xl rounded-b-2xl font-medium uppercase"
-                        onClick={login}>Login
+                        type={"submit"}>Login
                     </button>
                 </form>
             </div>

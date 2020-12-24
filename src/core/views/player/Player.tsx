@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import ReactPlayer from "react-player";
 import {usePlayer} from "./provider/PlayerProvider";
 import Duration from "./components/Duration";
-import {makeStyles, Slider} from "@material-ui/core";
+import {Slider} from "@material-ui/core";
 import {useNotification} from "../notification/provider/NotificationProvider";
 import PlayerLeftSection from "./components/PlayerLeftSection";
 import PlayerRightSection from "./components/PlayerRightSection";
@@ -18,29 +18,28 @@ function Player() {
 
     const classes = sliderUseStyles()
 
-    console.log(sliderUseStyles)
-
     return (
         <div
             className="w-full fixed flex flex-row justify-between items-center h-12 bottom-0 bg-bg-secondary rounded-t-2xl shadow-inverse transition-all duration-500">
             <PlayerLeftSection/>
             <div className="flex flex-grow h-12 justify-between items-center">
                 <Duration seconds={player.progress.playedSeconds}/>
-                <div className="sm:w-full h-full absolute px-8 left-12 right-12 bottom-12 sm:bottom-0 sm:left-0 sm:right-0 sm:relative flex flex-col justify-center items-center">
+                <div
+                    className="sm:w-full h-full absolute px-8 left-12 right-12 bottom-12 sm:bottom-0 sm:left-0 sm:right-0 sm:relative flex flex-col justify-center items-center">
                     <div className="absolute sm:hidden bg-bg-secondary w-full h-full shadow-inverse rounded-t-2xl"/>
                     <Slider
-                    classes={{
-                        root: classes.root + ' transition-all duration-500',
-                        thumb: 'transition-color duration-500'
-                    }}
-                    onMouseDown={player.handleSeekMouseDown}
-                    onChange={player.handleSeekChange}
-                    onTouchEnd={player.handleSeekMouseUp}
-                    onMouseUp={player.handleSeekMouseUp}
-                    value={player.progress.playedSeconds}
-                    min={0}
-                    max={player.state.duration}
-                />
+                        classes={{
+                            root: classes.root + ' transition-all duration-500',
+                            thumb: 'transition-color duration-500'
+                        }}
+                        onMouseDown={player.handleSeekMouseDown}
+                        onChange={player.handleSeekChange}
+                        onTouchEnd={player.handleSeekMouseUp}
+                        onMouseUp={player.handleSeekMouseUp}
+                        value={player.progress.playedSeconds}
+                        min={0}
+                        max={player.state.duration}
+                    />
                 </div>
                 <Duration seconds={player.state.duration}/>
             </div>
@@ -64,25 +63,24 @@ function Player() {
                     volume={player.state.volume}
                     muted={player.state.muted}
                     onReady={() => {
-                        console.log(player.state.url)
                     }}
                     onStart={() => {
-                        console.log(`onStart ${player.state}`)
                     }}
                     onPlay={player.handlePlay}
                     onEnablePIP={player.handleEnablePip}
                     onDisablePIP={player.handleDisablePip}
                     onPause={player.handlePause}
                     onBuffer={() => {
-                        console.log(`onBuffer ${player.state}`)
                     }}
-                    onSeek={e => console.log('onSeek', e)}
+                    onSeek={value => console.log(value)}
                     onEnded={player.handleEnded}
                     onError={e => {
                         if (e === 150) {
                             nProvider.notify("Can't play the video, it's playable from youtube only.",
                                 "warning"
                             )
+                        } else {
+                            nProvider.notify(`Unknown error: ${e}`,"error")
                         }
                     }}
                     onProgress={player.handleProgress}

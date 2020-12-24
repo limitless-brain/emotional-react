@@ -3,6 +3,8 @@ import {BUTTON_TAILWIND_STYLE, isEmpty, paperUseStyles, volumeSliderUseStyles} f
 import {ClickAwayListener, Paper, Popper, Slider} from "@material-ui/core";
 import {usePlayer} from "../provider/PlayerProvider";
 import {useNotification} from "../../notification/provider/NotificationProvider";
+import Api from "../../../api/Api";
+import {BASE_URL} from "../../../config";
 
 const PlayerRightSection: React.FC<{ showVideo: boolean, setShowVideo: (b: boolean) => void }> = (props) => {
 
@@ -16,6 +18,14 @@ const PlayerRightSection: React.FC<{ showVideo: boolean, setShowVideo: (b: boole
         setShowVolume(!showVolume)
     }
 
+    const onCaptionClick = () => {
+        Api.youtube.audioFile('4uOHQ7mO-Kk')
+            .then(resp => {
+                console.log(resp)
+            })
+            .catch(error => console.log(error.response))
+    }
+
     const sliderClasses = volumeSliderUseStyles()
 
     const paperClasses = paperUseStyles()
@@ -25,7 +35,7 @@ const PlayerRightSection: React.FC<{ showVideo: boolean, setShowVideo: (b: boole
         <div className="flex flex-row justify-end items-center">
 
             <button
-                onClick={() => props.setShowVideo(!props.showVideo)}
+                onClick={onCaptionClick}
                 className={`${BUTTON_TAILWIND_STYLE}`}>
                 <i className="w-12 fa fa-bars"/>
             </button>

@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useRef, useState} from 'react';
+import React, {createContext, useContext, useState} from 'react';
 import ReactPlayer from "react-player";
 
 /**
@@ -355,6 +355,7 @@ function usePlayerProvider() {
             return
         // set seeking to false
         state.seeking = false
+
         // seek player to the given value
         playerRef!.seekTo(progress.playedSeconds)
 
@@ -402,8 +403,13 @@ function usePlayerProvider() {
      * @param duration
      */
     const handleDuration = (duration: number) => {
-        // store duration
-        state.duration = duration
+        // check if duration = 0
+        if(duration !== playerRef?.getDuration())
+            // store duration
+            state.duration = playerRef?.getDuration()!
+        else
+            // store duration
+            state.duration = duration
 
         // update
         update()

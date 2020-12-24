@@ -6,7 +6,7 @@
 |
 */
 
-export default {
+const BaseTheme = {
     primary: '#f9f9f9',
     primaryLight: '#fcfcfc',
     primaryDark: '#c6c6c6',
@@ -25,3 +25,5 @@ export default {
     backgroundSecondary: '#f9f9f9',
     divider: '#494949'
 }
+
+export default BaseTheme

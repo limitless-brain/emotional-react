@@ -1,9 +1,10 @@
 import axios from "axios"
 import Auth from "./Auth";
 import Youtube from "./Youtube";
+import {BASE_URL} from "../config";
 
 // axios base url
-axios.defaults.baseURL = "http://192.168.0.101:8000/api/v1"
+axios.defaults.baseURL = `${BASE_URL}api/v1`
 
 // auth cookie setup
 axios.defaults.xsrfCookieName = 'XSRF-TOKEN'

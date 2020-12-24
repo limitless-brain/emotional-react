@@ -1,5 +1,5 @@
 import {extend} from "./utils";
-import base from "./base";
+import BaseTheme from "./base";
 
 /*
 |--------------------------------------------------------------------------
@@ -9,7 +9,7 @@ import base from "./base";
 |
 */
 
-export default extend(base, {
+export default extend(BaseTheme, {
     actionActive: '#424242',
     actionDisabled: '#303030',
     actionDisabledBackground: '#303030',

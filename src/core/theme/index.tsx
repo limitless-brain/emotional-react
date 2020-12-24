@@ -1,8 +1,7 @@
 import {applyTheme, IThemes} from "./utils";
 import base from "./base";
 import dark from "./dark";
-import React, {createContext, useContext, useEffect, useState} from "react";
-import {useCookies} from "react-cookie";
+import React, {createContext, useContext, useState} from "react";
 
 /**
  * Theme context state blueprint
