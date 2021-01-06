@@ -29,7 +29,7 @@ const Auth = {
      * @return {Promise<AxiosResponse<any>>}
      */
     profile: async (id?: string) => {
-        return await axios.get('/user', {
+        return await axios.get('/user/show', {
             params: id,
         })
     },

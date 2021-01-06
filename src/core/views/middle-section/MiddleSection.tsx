@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import Api from "../../api/Api";
-import {usePlayer} from "../player/provider/PlayerProvider";
+import {usePlayer} from "../../providers/PlayerProvider";
 import {getYoutubeVideoId} from "../../utils/Utils";
-import {useNotification} from "../notification/provider/NotificationProvider";
+import {DEBUG} from "../../config";
 
 interface ISong {
     key: string | number,
@@ -67,48 +67,48 @@ const SongItem: React.FC<ISong> = (props) => {
 
     return (
         <div id={`song-control-${props.youtubeId}`}
-             className={`${player.state.playing && playingVideoId === props.youtubeId?'bg-bg-primary':'bg-bg-secondary'} shadow-around rounded-2xl transition-all duration-500`}>
+             className={`${player.state.playing && playingVideoId === props.youtubeId ? 'bg-bg-primary' : 'bg-bg-secondary'} shadow-around rounded-2xl transition-all duration-500`}>
             <div className="flex flex-col justify-start items-start">
                 <div className="flex flex-row justify-between w-full">
                     <img src={props.img}
-                         className="rounded-tl-2xl rounded-br-2xl md:block shadow-around"/>
+                         className="rounded-tl-2xl rounded-br-2xl md:block shadow-around" alt={''}/>
                     <div className="inline-flex flex-row justify-center">
                         <button
-                            className="relative h-12 w-12 outline-none focus:outline-none text-text-primary rounded-bl-2xl shadow transform hover:bg-primary transition-all duration-500">
+                            className="relative h-12 w-12 outline-none focus:outline-none text-text-primary rounded-bl-2xl shadow transform hover:bg-action-hover focus:bg-action-selected transition-all duration-500">
                             <i className="fa fa-heartbeat"/>
                         </button>
                         <button
-                            className="h-12 w-12 outline-none focus:outline-none text-text-primary shadow transform hover:bg-primary transition-all duration-500">
+                            className="h-12 w-12 outline-none focus:outline-none text-text-primary shadow transform hover:bg-action-hover focus:bg-action-selected transition-all duration-500">
                             <i className="fa fa-plus"/>
                         </button>
                         <button
                             onClick={onPlayClick}
-                            className="h-12 w-12 outline-none focus:outline-none text-text-primary rounded-tr-2xl shadow transform hover:bg-primary transition-all duration-500">
-                            <i className={`fa ${ playingVideoId !== props.youtubeId ? 'fa-play' : player.state.playing ? 'fa-pause' : 'fa-play'}`}/>
+                            className="h-12 w-12 outline-none focus:outline-none text-text-primary rounded-tr-2xl shadow transform hover:bg-action-hover focus:bg-action-selected transition-all duration-500">
+                            <i className={`fa ${playingVideoId !== props.youtubeId ? 'fa-play' : player.state.playing ? 'fa-pause' : 'fa-play'}`}/>
                         </button>
                     </div>
                 </div>
                 <div className="flex flex-col justify-end items-end w-full">
                     <div className="w-full p-8">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between text-text-primary">
                             <div>
-                                <h3 className="text-2xl text-text-primary font-medium">{props.title}</h3>
-                                <p className="text-sm text-text-primary opacity-75 mt-1">{props.title}</p>
+                                <h3 className="text-2xl font-medium">{props.title}</h3>
+                                <p className="text-sm opacity-75 mt-1">{props.title}</p>
                             </div>
                         </div>
-                        <div className="mt-6 pt-6 space-x-2 text-gray-600 flex flex-wrap border-t">
+                        <div className="mt-6 pt-6 text-text-primary space-x-2 flex flex-wrap border-t">
                             <div
-                                className="flex flex-row space-x-1 text-xs uppercase tracking-wider shadow p-1 rounded-2xl px-2">
+                                className="flex flex-row space-x-1 text-xs uppercase tracking-wider shadow-around p-1 rounded-2xl px-2">
                                 <p>JOY</p>
                                 <p>75%</p>
                             </div>
                             <div
-                                className="flex flex-row space-x-1 text-xs uppercase tracking-wider shadow p-1 rounded-2xl px-2">
+                                className="flex flex-row space-x-1 text-xs uppercase tracking-wider shadow-around p-1 rounded-2xl px-2">
                                 <p>sad</p>
                                 <p>15%</p>
                             </div>
                             <div
-                                className="flex flex-row space-x-1 text-xs uppercase tracking-wider shadow p-1 rounded-2xl px-2">
+                                className="flex flex-row space-x-1 text-xs uppercase tracking-wider shadow-around p-1 rounded-2xl px-2">
                                 <p>love</p>
                                 <p>75%</p>
                             </div>
@@ -122,11 +122,9 @@ const SongItem: React.FC<ISong> = (props) => {
 
 function MiddleSection() {
 
-    const nProvider = useNotification()
-
     const [elements, setElements] = useState([])
 
-    const [refresh, setRefresh] = useState(false)
+    const [refresh,] = useState(false)
 
     const createElements = async () => {
 
@@ -143,16 +141,22 @@ function MiddleSection() {
             })
             setElements(songItems)
         })
+            .catch(error => {
+                if (DEBUG)
+                    console.log(error)
+            })
     }
 
     useEffect(() => {
-        createElements()
+        createElements().then()
     }, [refresh])
 
     return (
         <div
-            className="flex-grow flex-col h-full mx-6 overflow-y-scroll no-scrollbar justify-start items-end p-4 space-y-6">
+            className="absolute flex-grow flex-col h-full overflow-y-scroll no-scrollbar justify-start items-end px-6 space-y-6">
+            <div className="h-12"/>
             {elements}
+            <div className="h-12"/>
         </div>
     );
 }

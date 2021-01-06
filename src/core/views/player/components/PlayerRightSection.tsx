@@ -1,10 +1,10 @@
 import React, {useState} from "react";
 import {BUTTON_TAILWIND_STYLE, isEmpty, paperUseStyles, volumeSliderUseStyles} from "../../../utils/Utils";
 import {ClickAwayListener, Paper, Popper, Slider} from "@material-ui/core";
-import {usePlayer} from "../provider/PlayerProvider";
-import {useNotification} from "../../notification/provider/NotificationProvider";
+import {usePlayer} from "../../../providers/PlayerProvider";
+import {useNotification} from "../../../providers/NotificationProvider";
 import Api from "../../../api/Api";
-import {BASE_URL} from "../../../config";
+import {DEBUG} from "../../../config";
 
 const PlayerRightSection: React.FC<{ showVideo: boolean, setShowVideo: (b: boolean) => void }> = (props) => {
 
@@ -19,11 +19,14 @@ const PlayerRightSection: React.FC<{ showVideo: boolean, setShowVideo: (b: boole
     }
 
     const onCaptionClick = () => {
-        Api.youtube.audioFile('4uOHQ7mO-Kk')
-            .then(resp => {
+        Api.youtube.lyrics().then(resp => {
+            if(DEBUG)
                 console.log(resp)
+        })
+            .catch(error => {
+                if(DEBUG)
+                    console.log(error.response)
             })
-            .catch(error => console.log(error.response))
     }
 
     const sliderClasses = volumeSliderUseStyles()
@@ -71,8 +74,8 @@ const PlayerRightSection: React.FC<{ showVideo: boolean, setShowVideo: (b: boole
             </ClickAwayListener>
             <button
                 onClick={() => {
-                    if(isEmpty(player.state.url))
-                        nProvider.notify('There is no video playing right now',"info")
+                    if (isEmpty(player.state.url))
+                        nProvider.notify('There is no video playing right now', "info")
                     else
                         props.setShowVideo(!props.showVideo)
                 }}

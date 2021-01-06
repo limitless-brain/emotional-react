@@ -1,7 +1,7 @@
 import React from "react";
-import {usePlayer} from "../provider/PlayerProvider";
+import {usePlayer} from "../../../providers/PlayerProvider";
 import {BUTTON_TAILWIND_STYLE} from "../../../utils/Utils";
-import {useNotification} from "../../notification/provider/NotificationProvider";
+import {useNotification} from "../../../providers/NotificationProvider";
 
 const PlayerLeftSection: React.FC = () => {
 

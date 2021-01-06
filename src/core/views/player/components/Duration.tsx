@@ -24,7 +24,7 @@ const Duration: React.FC<{ seconds: number, className?: string }> = (props) => {
 
     // return component design
     return (
-        <time dateTime={`P${Math.round(seconds)}S`} className={`h-full flex flex-grow justify-center items-center px-2 shadow ${classes}`}>
+        <time dateTime={`P${Math.round(seconds)}S`} className={`h-full flex flex-grow justify-center text-text-primary items-center px-2 shadow ${classes}`}>
             {format(seconds)}
         </time >
     );

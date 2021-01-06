@@ -64,7 +64,7 @@ export const BUTTON_TAILWIND_STYLE = "h-12 w-12 outline-none focus:outline-none 
  */
 export const sliderUseStyles = makeStyles({
     root: {
-        color: 'var(--color-text-primary)'
+        color: 'var(--color-text-primary)',
     },
 })
 

@@ -1,7 +1,7 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Snackbar} from "@material-ui/core";
 import MuiAlert, {AlertProps} from "@material-ui/lab/Alert"
-import {useNotification} from "./provider/NotificationProvider";
+import {useNotification} from "../../providers/NotificationProvider";
 
 function Alert(props: AlertProps) {
     return <MuiAlert elevation={6} variant={"filled"} {...props}/>

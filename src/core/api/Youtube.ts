@@ -12,6 +12,9 @@ const Youtube = {
     },
     audioFile: async (id: string) => {
         return await axios.get(`/videos/${id}/audio`)
+    },
+    lyrics: async () => {
+        return await axios.get('/lyrics')
     }
 }
 

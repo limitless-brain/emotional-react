@@ -2,18 +2,14 @@ import React, {useEffect} from 'react';
 import './core/css/main.css'
 import {DEFAULT_THEME, useTheme} from "./core/theme";
 import AppRouter from "./core/views/router/AppRouter";
-import {useAuth} from "./core/views/auth/provider/AuthProvider";
 import {useCookies} from "react-cookie";
 
 
 function App() {
 
-    const auth = useAuth()
     const theme = useTheme()
 
     const [cookie, setCookie] = useCookies()
-
-    auth.user.isLogin = cookie['XSRF-TOKEN'] !== undefined
 
     // one time update
     useEffect(() => {
@@ -22,8 +18,9 @@ function App() {
             // initialize base theme
             theme.name = DEFAULT_THEME
             setCookie('theme', DEFAULT_THEME)
+        } else {
+            theme.name = cookie['theme']
         }
-
         // switch theme
         theme.switchTheme(theme.name)
     })

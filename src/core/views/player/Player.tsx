@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import ReactPlayer from "react-player";
-import {usePlayer} from "./provider/PlayerProvider";
+import {usePlayer} from "../../providers/PlayerProvider";
 import Duration from "./components/Duration";
 import {Slider} from "@material-ui/core";
-import {useNotification} from "../notification/provider/NotificationProvider";
+import {useNotification} from "../../providers/NotificationProvider";
 import PlayerLeftSection from "./components/PlayerLeftSection";
 import PlayerRightSection from "./components/PlayerRightSection";
 import {sliderUseStyles} from "../../utils/Utils";
+import {DEBUG} from "../../config";
 
 function Player() {
 
@@ -45,7 +46,7 @@ function Player() {
             </div>
             <PlayerRightSection showVideo={showVideo} setShowVideo={setShowVideo}/>
             <div
-                className={`absolute ${!showVideo ? 'hidden' : ''} sm:w-96 h-96 bg-primary shadow rounded-2xl p-4 bottom-28 sm:bottom-14 right-2 left-2 sm:left-auto transition-all duration-500`}>
+                className={`absolute ${!showVideo ? 'hidden' : ''} sm:w-96 bg-primary shadow rounded-2xl p-4 bottom-28 sm:bottom-14 right-2 left-2 sm:left-auto transition-all duration-500`}>
                 <ReactPlayer
                     style={{
                         borderRadius: '1rem'
@@ -72,15 +73,17 @@ function Player() {
                     onPause={player.handlePause}
                     onBuffer={() => {
                     }}
-                    onSeek={value => console.log(value)}
+                    onSeek={value => {
+                        if (DEBUG)
+                            console.log(value)
+                    }}
                     onEnded={player.handleEnded}
                     onError={e => {
                         if (e === 150) {
                             nProvider.notify("Can't play the video, it's playable from youtube only.",
-                                "warning"
-                            )
+                                "warning")
                         } else {
-                            nProvider.notify(`Unknown error: ${e}`,"error")
+                            nProvider.notify(`Unknown error: ${e}`, "error")
                         }
                     }}
                     onProgress={player.handleProgress}
@@ -89,6 +92,11 @@ function Player() {
                         youtube: {
                             playerVars: {
                                 autoplay: true,
+                            }
+                        },
+                        file: {
+                            attributes: {
+                                controls: true
                             }
                         }
                     }}
