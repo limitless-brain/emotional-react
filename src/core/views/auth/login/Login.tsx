@@ -32,19 +32,17 @@ function Login() {
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => handleInputOnChange(event, cred, setCred)
 
     return (
-        <div className="absolute h-screen flex flex-col md:flex-row text-text-primary justify-center items-center">
-            <img alt={''} className="h-96" src={loginPng}/>
+        <div className="absolute h-screen py-4 flex flex-col md:flex-row text-text-primary justify-center items-center">
+            <img alt={''} className="h-48 sm:h-96" src={loginPng}/>
 
-            <div className="flex flex-col justify-center w-80 mx-6 space-y-4 items-center">
-                <h1
-                    className="select-none font-medium text-3xl">Emotional</h1>
-                <form className="flex flex-col items-end shadow-around rounded-2xl" onSubmit={login}>
+            <div className="flex flex-col justify-center mx-6 space-y-4 items-center">
+                <form className="flex flex-col w-80 items-end shadow-around rounded-2xl" onSubmit={login}>
                     <div className="flex flex-row w-full shadow rounded-t-2xl">
                         <div className="p-4 w-12">
                             <span className="fa fa-user"/>
                         </div>
                         <input
-                            className="w-full text-xl font-normal focus:outline-none focus:bg-bg-primary bg-transparent px-4"
+                            className="w-full text-xl font-normal focus:outline-none focus:bg-bg-primary rounded-tr-2xl bg-transparent px-4"
                             name="email" placeholder="Email" onChange={onChange} required/>
                     </div>
                     <div className="flex flex-row shadow">
@@ -84,7 +82,7 @@ function Login() {
                     </button>
                 </form>
                 <div className="flex flex-row space-x-4 font-normal select-none">
-                    <span>Already have an account?</span>
+                    <span>Don't have an account?</span>
                     <NavLink
                         to={'/signup'}
                         className="uppercase hover:text-action-hover font-semibold">sign up</NavLink>

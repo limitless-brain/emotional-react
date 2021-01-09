@@ -1,65 +1,7 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import ReactPlayer from "react-player";
-
-/**
- * Player provider blueprint
- *
- */
-interface IPlayerProvider {
-    state: IPlayerState,
-    progress: IProgressState,
-    setPlayer: (player: ReactPlayer | null) => void,
-    load: (url: string) => void,
-    handlePlayPause: () => void,
-    handlePlay: () => void,
-    handlePause: () => void,
-    handleStop: () => void,
-    handleTogglePip: () => void,
-    handleEnablePip: () => void,
-    handleDisablePip: () => void,
-    handleDuration: (duration: number) => void,
-    handleClickFullscreen: () => void,
-    handleEnded: () => void,
-    handleSeekChange: (event: any, newValue: (number | number[])) => void,
-    handleSeekMouseDown: (event: any) => void,
-    handleSeekMouseUp: (event: any) => void,
-    handleProgress: (state: IProgressState) => void,
-    handleSetPlaybackRate: (rate: '0.5' | '1.0' | '1.25' | '1.5' | '2.0') => void,
-    handleToggleControls: () => void,
-    handleToggleLoop: () => void,
-    handleToggleMuted: () => void,
-    handleToggleLight: () => void,
-    handleVolumeChange: (event: any, volume: (number | number[])) => void
-}
-
-/**
- * Player state blueprint
- *
- */
-interface IPlayerState {
-    url: string,
-    pip: boolean,
-    playing: boolean,
-    controls: boolean,
-    light: boolean,
-    volume: number,
-    muted: boolean,
-    duration: number,
-    playbackRate: number,
-    loop: boolean,
-    seeking: boolean
-}
-
-/**
- * Player Progress blueprint
- *
- */
-interface IProgressState {
-    played: number,
-    playedSeconds: number,
-    loaded: number,
-    loadedSeconds: number
-}
+import {IPlayerPlaylist, IPlayerProvider, IPlayerState, IProgressState, ISong} from "./blueprint";
+import {DEBUG} from "../../config";
 
 /**
  * Default player state object
@@ -103,14 +45,38 @@ function usePlayerProvider() {
     const [refresh, setRefresh] = useState(false)
 
     // player ref to hold {ReactPlayer} component ref
-    const [playerRef, setPlayerRef] = useState<ReactPlayer|null>(null)
+    const [playerRef, setPlayerRef] = useState<ReactPlayer | null>(null)
+
+    // player playlist
+    const [playlistRef, setPlaylistRef] = useState<IPlayerPlaylist | null>(null)
 
     /**
      * The method that set react player instance
-     * @param _player
+     * @param player
      */
-    const setPlayer = (_player: ReactPlayer | null) => {
-        setPlayerRef(_player)
+    const setPlayer = (player: ReactPlayer | null) => {
+        setPlayerRef(player)
+    }
+
+    /**
+     * The method that set playlist state
+     * @param playlist
+     */
+    const setPlaylist = (playlist: IPlayerPlaylist | null) => {
+
+        // check if we receive playlist
+        if (playlist){
+
+            // check if we have to update
+            if(playlist !== playlistRef) {
+
+                // update the playlist
+                setPlaylistRef({...playlist})
+
+                // update the player
+                update()
+            }
+        }
     }
 
     /**
@@ -122,6 +88,90 @@ function usePlayerProvider() {
 
         // request hierarchy update
         setRefresh(!refresh)
+    }
+
+    /**
+     * The method that play a given song object
+     *
+     * @param song
+     */
+    const play = (song: ISong) => {
+
+        // if we don't have a playlist
+        if (!playlistRef) {
+            // use load method
+            load(song.url)
+        } else {
+
+            if(DEBUG)
+                console.log(`play song ${song}`)
+
+            // load the song from the list
+            let _song = playlistRef.tracks[playlistRef.current]
+            load(_song.url)
+        }
+    }
+
+    /**
+     * The method that plays the song at i in the playlist
+     *
+     */
+
+    const playAt = (index: number) => {
+
+        // call only if we have playlist
+        if (playlistRef) {
+
+            // return -1 if there is out of index
+            if (playlistRef.tracks.length <= index)
+                return -1
+
+            // update playlist current
+            playlistRef.current = index
+
+            // store playlist state
+            setPlaylistRef({...playlistRef})
+
+            // play the song
+            let song = playlistRef.tracks[index]
+            play(song)
+        }
+    }
+
+    /**
+     * The method that plays the next song in the playlist
+     *
+     */
+    const playNext = () => {
+
+        // call only if we have playlist
+        console.log(playlistRef)
+        if (playlistRef) {
+            // return -1 if there is no next
+            if (playlistRef.current === (playlistRef.tracks.length - 1))
+                return -1
+
+            // play the song
+            playAt(++playlistRef.current)
+        }
+    }
+
+    /**
+     * The method that plays the next song in the playlist
+     *
+     */
+    const playPrevious = () => {
+
+        // call only if we have playlist
+        if (playlistRef) {
+
+            // return -1 if there is no previous
+            if (playlistRef.current === 0)
+                return -1
+
+            // play the song
+            playAt(--playlistRef.current)
+        }
     }
 
     /**
@@ -351,7 +401,7 @@ function usePlayerProvider() {
      */
     const handleSeekMouseUp = (_event: any) => {
         // if player null, return
-        if(!playerRef)
+        if (!playerRef)
             return
         // set seeking to false
         state.seeking = false
@@ -384,6 +434,16 @@ function usePlayerProvider() {
      * The method that handle player ended event
      */
     const handleEnded = () => {
+
+        // check if we play playlist
+        // and not looping
+        if (playlistRef && !state.loop) {
+            // check if we have next track
+            if(playNext() !== -1) {
+                // we are playing a song
+                return
+            }
+        }
         // set playing to looping state
         state.playing = state.loop
         // set duration to track length
@@ -404,7 +464,7 @@ function usePlayerProvider() {
      */
     const handleDuration = (duration: number) => {
         // check if duration = 0
-        if(duration !== playerRef?.getDuration())
+        if (duration !== playerRef?.getDuration())
             // store duration
             state.duration = playerRef?.getDuration()!
         else
@@ -423,11 +483,28 @@ function usePlayerProvider() {
         // not used for the purpose of the project
     }
 
+    /**
+     * Playlist useEffect
+     *
+     */
+
+    useEffect(()=>{
+        if(playlistRef) {
+            play(playlistRef.tracks[0])
+        }
+    },[playlistRef])
+
     // return Player provider object
     return {
         state,
         progress,
+        playlist: playlistRef,
         setPlayer,
+        setPlaylist,
+        play,
+        playAt,
+        playNext,
+        playPrevious,
         load,
         handlePlayPause,
         handlePlay,

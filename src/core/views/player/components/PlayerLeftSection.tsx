@@ -1,5 +1,5 @@
 import React from "react";
-import {usePlayer} from "../../../providers/PlayerProvider";
+import {usePlayer} from "../../../providers/player/PlayerProvider";
 import {BUTTON_TAILWIND_STYLE} from "../../../utils/Utils";
 import {useNotification} from "../../../providers/NotificationProvider";
 

@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import {AuthProvider} from "./core/providers/AuthProvider";
 import {ThemeProvider} from "./core/theme";
 import {CookiesProvider} from "react-cookie";
-import {PlayerProvider} from "./core/providers/PlayerProvider";
+import {PlayerProvider} from "./core/providers/player/PlayerProvider";
 import {NotificationProvider} from "./core/providers/NotificationProvider";
 import Notification from "./core/views/notification/Notification";
 

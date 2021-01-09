@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import ReactPlayer from "react-player";
-import {usePlayer} from "../../providers/PlayerProvider";
+import {usePlayer} from "../../providers/player/PlayerProvider";
 import Duration from "./components/Duration";
 import {Slider} from "@material-ui/core";
 import {useNotification} from "../../providers/NotificationProvider";
 import PlayerLeftSection from "./components/PlayerLeftSection";
 import PlayerRightSection from "./components/PlayerRightSection";
 import {sliderUseStyles} from "../../utils/Utils";
-import {DEBUG} from "../../config";
+import {DEBUG, ORIGIN_BASE_URL} from "../../config";
 
-function Player() {
+const Player: React.FC = (props) => {
 
     const player = usePlayer()
 
@@ -46,6 +46,7 @@ function Player() {
             </div>
             <PlayerRightSection showVideo={showVideo} setShowVideo={setShowVideo}/>
             <div
+                id={'react-player'}
                 className={`absolute ${!showVideo ? 'hidden' : ''} sm:w-96 bg-primary shadow rounded-2xl p-4 bottom-28 sm:bottom-14 right-2 left-2 sm:left-auto transition-all duration-500`}>
                 <ReactPlayer
                     style={{
@@ -82,6 +83,7 @@ function Player() {
                         if (e === 150) {
                             nProvider.notify("Can't play the video, it's playable from youtube only.",
                                 "warning")
+                            player.playNext()
                         } else {
                             nProvider.notify(`Unknown error: ${e}`, "error")
                         }
@@ -92,6 +94,7 @@ function Player() {
                         youtube: {
                             playerVars: {
                                 autoplay: true,
+                                origin: ORIGIN_BASE_URL
                             }
                         },
                         file: {

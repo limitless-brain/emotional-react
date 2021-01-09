@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {BUTTON_TAILWIND_STYLE, isEmpty, paperUseStyles, volumeSliderUseStyles} from "../../../utils/Utils";
 import {ClickAwayListener, Paper, Popper, Slider} from "@material-ui/core";
-import {usePlayer} from "../../../providers/PlayerProvider";
+import {usePlayer} from "../../../providers/player/PlayerProvider";
 import {useNotification} from "../../../providers/NotificationProvider";
 import Api from "../../../api/Api";
 import {DEBUG} from "../../../config";

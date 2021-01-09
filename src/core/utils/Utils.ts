@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {makeStyles} from "@material-ui/core";
+import ResizeObserver from "resize-observer-polyfill";
 
 /**
  * the method that handle change event for html input
@@ -22,32 +23,28 @@ export function handleInputOnCheck(event: React.ChangeEvent<HTMLInputElement>, o
     obj[event.target.name] = event.target.checked
 }
 
-export function toRad(a: Number): Number {
-    return (a.valueOf() * Math.PI) / 180
-}
-
-export function getCircumferenceX(rad: Number, theta: Number): Number {
-    return rad.valueOf() * Math.cos(theta.valueOf())
-}
-
-export function getCircumferenceY(rad: Number, theta: Number): Number {
-    return rad.valueOf() * Math.sin(theta.valueOf())
-}
-
+/**
+ * The method that extract youtube id from url
+ * @param url
+ */
 export function getYoutubeVideoId(url: string): string {
     return url.substring(url.indexOf('=') + 1)
 }
 
+/**
+ * The method that return formatted string for number of second
+ * @param seconds
+ */
 export function format(seconds: number): string {
 
     const date = new Date(seconds * 1000)
 
     const hh = date.getUTCHours()
-    const mm = date.getUTCMinutes().toString().padStart(2,'0')
-    const ss = date.getUTCSeconds().toString().padStart(2,'0')
+    const mm = date.getUTCMinutes().toString().padStart(2, '0')
+    const ss = date.getUTCSeconds().toString().padStart(2, '0')
 
     if (hh) {
-        return `${hh.toString().padStart(2,'0')}:${mm}:${ss}`
+        return `${hh.toString().padStart(2, '0')}:${mm}:${ss}`
     }
 
     return `${mm}:${ss}`
@@ -89,6 +86,38 @@ export const volumeSliderUseStyles = makeStyles({
     },
 })
 
+/**
+ * The method that return true if string is empty
+ * @param str
+ */
 export function isEmpty(str: string): boolean {
     return (!str || 0 === str.length)
+}
+
+/**
+ * Resize observer hook
+ * @param ref
+ */
+export function useResizeObserver(ref: React.RefObject<any>) {
+    const [dimensions, setDimensions] = useState<any>(null)
+
+    useEffect(() => {
+        const observerTarget = ref.current
+        const observer = new ResizeObserver((entries) => {
+            entries.forEach(entry => {
+                setDimensions(entry.contentRect);
+            })
+        })
+
+        // observe changes
+        observer.observe(observerTarget)
+
+        return () => {
+            // cleaning
+            observer.unobserve(observerTarget)
+        }
+
+    }, [ref])
+
+    return dimensions
 }

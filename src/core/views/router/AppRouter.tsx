@@ -11,6 +11,7 @@ import Player from "../player/Player";
 import Home from "../Home/Home";
 import SignUp from "../auth/signup/SignUp";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
+import EmotionsCircle from "../emotion-circle/EmotionsCircle";
 
 const AppRouter: React.FC = () => {
 
@@ -43,9 +44,6 @@ const AnimatedRoutes: React.FC<{isLogin: boolean}> = (props) => {
         <TransitionGroup component={null}>
             <CSSTransition key={location.key} classNames="fade" timeout={450}>
                 <Switch location={location}>
-                    <PrivateRoute exact path="/" condition={props.isLogin} redirectTo="/login">
-                        <Home/>
-                    </PrivateRoute>
                     <PrivateRoute path="/login" condition={!props.isLogin} redirectTo="/">
                         <Login/>
                     </PrivateRoute>
@@ -56,6 +54,9 @@ const AnimatedRoutes: React.FC<{isLogin: boolean}> = (props) => {
                         <div className="flex flex-row h-full justify-center items-end">
                             <MiddleSection/>
                         </div>
+                    </PrivateRoute>
+                    <PrivateRoute exact path="/" condition={props.isLogin} redirectTo="/login">
+                        <EmotionsCircle/>
                     </PrivateRoute>
                 </Switch>
             </CSSTransition>

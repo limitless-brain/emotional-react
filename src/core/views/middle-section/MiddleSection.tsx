@@ -1,17 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import Api from "../../api/Api";
-import {usePlayer} from "../../providers/PlayerProvider";
+import {usePlayer} from "../../providers/player/PlayerProvider";
 import {getYoutubeVideoId} from "../../utils/Utils";
-import {DEBUG} from "../../config";
-
-interface ISong {
-    key: string | number,
-    title: string,
-    description: string,
-    img: string,
-    youtubeId: string,
-    emotions: Array<string>
-}
+import {DEBUG, YOUTUBE_VIDEO} from "../../config";
+import {ISong} from "../../providers/player/blueprint";
 
 interface IYoutubeVideo {
     etag: string,
@@ -59,10 +51,11 @@ const SongItem: React.FC<ISong> = (props) => {
     const playingVideoId = getYoutubeVideoId(player.state.url)
 
     const onPlayClick = () => {
-        if (playingVideoId !== props.youtubeId)
-            player.load(`https://www.youtube.com/watch?v=${props.youtubeId}`)
-        else
+        if (playingVideoId !== props.youtubeId) {
+            player.load(props.url)
+        } else {
             player.handlePlayPause()
+        }
     }
 
     return (
@@ -126,17 +119,20 @@ function MiddleSection() {
 
     const [refresh,] = useState(false)
 
+
     const createElements = async () => {
 
         await Api.youtube.featured().then(resp => {
             let videos: Array<IYoutubeVideo> = JSON.parse(resp.data).items
             let songItems: any = []
             videos.forEach(video => {
+
                 songItems.push(<SongItem key={video.id}
                                          title={video.snippet.title}
                                          description={video.snippet.description}
                                          img={video.snippet.thumbnails.default.url}
                                          youtubeId={video.id}
+                                         url={YOUTUBE_VIDEO.concat(video.id)}
                                          emotions={['']}/>)
             })
             setElements(songItems)
