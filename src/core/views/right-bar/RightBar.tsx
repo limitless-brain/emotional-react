@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {BUTTON_TAILWIND_STYLE, paperUseStyles} from "../../utils/Utils";
 import {Divider, Drawer} from "@material-ui/core";
 import {useAuth} from "../../providers/AuthProvider";
-import {FullWidthButton} from "../button/CustomButton";
+import {FullWidthButton, FullWidthNavLink} from "../button/CustomButton";
 
 function RightBar() {
 
@@ -20,7 +20,7 @@ function RightBar() {
         // no profile
         if (auth.user.profile === undefined) {
             // request it
-            auth.getProfile(undefined, false).then((resp) => {
+            auth.getProfile(undefined, false).then((_) => {
                 // set it
                 setProfile(auth.user.profile)
             })
@@ -75,7 +75,7 @@ function RightBar() {
                         </div>
                         <Divider/>
                         <div className="flex flex-col w-full text-text-primary">
-                            <FullWidthButton label={'friends'} icon={'fa-user-friends'} iconPos={'right'}/>
+                            <FullWidthNavLink to='/users' label={'friends'} icon={'fa-user-friends'} iconPos={'right'}/>
                             <FullWidthButton label={'edit profile'} icon={'fa-user-edit'} iconPos={'right'}/>
                             <FullWidthButton onClick={() => {
                                 auth.logout().then()

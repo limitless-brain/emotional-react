@@ -7,9 +7,7 @@ import {NavLink, useHistory} from 'react-router-dom';
 
 function SignUp() {
 
-    const [cred, setCred] = useState({
-        email: "", password: "", password_confirmation: "", username: ""
-    } as ISignUpCred)
+    const [cred, setCred] = useState({} as ISignUpCred)
 
     const nProvider = useNotification()
 
@@ -21,6 +19,10 @@ function SignUp() {
         event.preventDefault()
 
         if (typeof cred.password !== "undefined" && typeof cred.password_confirmation !== "undefined") {
+            if (cred.password.length < 8) {
+                nProvider.notify("Password should be at least 8 characters", 'error')
+                return
+            }
             if (cred.password !== cred.password_confirmation) {
                 nProvider.notify('Password fields not match', 'error')
                 return
@@ -30,13 +32,7 @@ function SignUp() {
         auth.signup(cred).then(resp => {
             if (resp.status === 201)
                 auth.login({email: cred.email, password: cred.password, remember_me: false})
-                    .then(resp => {
-                        if (resp.status === 200) {
-                            setTimeout(() => {
-                                history.push('/')
-                            }, 1000)
-                        }
-                    })
+                    .then()
         })
     }
 

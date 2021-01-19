@@ -50,6 +50,8 @@ function usePlayerProvider() {
     // player playlist
     const [playlistRef, setPlaylistRef] = useState<IPlayerPlaylist | null>(null)
 
+    // current song
+    const [currentSong, setCurrentSong] = useState<ISong | null>(null)
     /**
      * The method that set react player instance
      * @param player
@@ -65,16 +67,18 @@ function usePlayerProvider() {
     const setPlaylist = (playlist: IPlayerPlaylist | null) => {
 
         // check if we receive playlist
-        if (playlist){
+        if (playlist) {
 
             // check if we have to update
-            if(playlist !== playlistRef) {
+            if (playlist !== playlistRef) {
 
                 // update the playlist
                 setPlaylistRef({...playlist})
 
                 // update the player
                 update()
+            } else {
+                play(playlist.tracks[0])
             }
         }
     }
@@ -97,18 +101,24 @@ function usePlayerProvider() {
      */
     const play = (song: ISong) => {
 
+        setCurrentSong(song)
+
         // if we don't have a playlist
         if (!playlistRef) {
             // use load method
             load(song.url)
         } else {
 
-            if(DEBUG)
-                console.log(`play song ${song}`)
+            if(!playlistRef.tracks.includes(song)) {
+                load(song.url)
+                setPlaylist(null)
+                return
+            }
 
             // load the song from the list
-            let _song = playlistRef.tracks[playlistRef.current]
-            load(_song.url)
+            if(playlistRef.tracks.indexOf(song) !== playlistRef.current)
+                playlistRef.current = playlistRef.tracks.indexOf(song)
+            load(song.url)
         }
     }
 
@@ -135,6 +145,8 @@ function usePlayerProvider() {
             // play the song
             let song = playlistRef.tracks[index]
             play(song)
+        } else {
+            return -1;
         }
     }
 
@@ -145,14 +157,16 @@ function usePlayerProvider() {
     const playNext = () => {
 
         // call only if we have playlist
-        console.log(playlistRef)
         if (playlistRef) {
+
             // return -1 if there is no next
             if (playlistRef.current === (playlistRef.tracks.length - 1))
                 return -1
-
+            let index = playlistRef.current + 1;
             // play the song
-            playAt(++playlistRef.current)
+            playAt(index)
+        } else {
+            return -1;
         }
     }
 
@@ -171,6 +185,8 @@ function usePlayerProvider() {
 
             // play the song
             playAt(--playlistRef.current)
+        } else {
+            return -1;
         }
     }
 
@@ -439,7 +455,7 @@ function usePlayerProvider() {
         // and not looping
         if (playlistRef && !state.loop) {
             // check if we have next track
-            if(playNext() !== -1) {
+            if (playNext() !== -1) {
                 // we are playing a song
                 return
             }
@@ -488,17 +504,18 @@ function usePlayerProvider() {
      *
      */
 
-    useEffect(()=>{
-        if(playlistRef) {
-            play(playlistRef.tracks[0])
+    useEffect(() => {
+        if (playlistRef) {
+            play(playlistRef.tracks[playlistRef.current])
         }
-    },[playlistRef])
+    }, [playlistRef])
 
     // return Player provider object
     return {
         state,
         progress,
         playlist: playlistRef,
+        currentSong,
         setPlayer,
         setPlaylist,
         play,

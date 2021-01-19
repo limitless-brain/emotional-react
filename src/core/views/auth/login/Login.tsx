@@ -16,17 +16,10 @@ function Login() {
 
     const auth = useAuth()
 
-    const history = useHistory()
-
     const login = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
 
-        auth.login(cred).then(resp => {
-            if (resp.status === 200)
-                setTimeout(() => {
-                    history.push('/featured')
-                },1000)
-        })
+        auth.login(cred).then()
     }
 
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => handleInputOnChange(event, cred, setCred)

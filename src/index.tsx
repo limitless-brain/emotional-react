@@ -8,6 +8,7 @@ import {CookiesProvider} from "react-cookie";
 import {PlayerProvider} from "./core/providers/player/PlayerProvider";
 import {NotificationProvider} from "./core/providers/NotificationProvider";
 import Notification from "./core/views/notification/Notification";
+import EmotionProvider from "./core/providers/emotion/EmotionProvider";
 
 ReactDOM.render(
     <React.StrictMode>
@@ -16,7 +17,9 @@ ReactDOM.render(
                 <NotificationProvider>
                     <AuthProvider>
                         <PlayerProvider>
-                            <App/>
+                            <EmotionProvider>
+                                <App/>
+                            </EmotionProvider>
                         </PlayerProvider>
                     </AuthProvider>
                     <Notification/>

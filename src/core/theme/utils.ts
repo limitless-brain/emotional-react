@@ -44,6 +44,7 @@ export const mapTheme = (variables: ITheme): IMappedTheme => {
         '--color-action-disabled-background': variables.actionDisabledBackground || '',
         '--color-text-primary': variables.textPrimary || '',
         '--color-text-secondary': variables.textSecondary || '',
+        '--color-text-emotion': variables.textEmotion || '',
         '--color-text-disabled': variables.textDisabled || '',
     }
 }

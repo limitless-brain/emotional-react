@@ -8,6 +8,7 @@ export const  SelectableFullWidthButton: React.FC<ISelectableButtonProps> = (pro
 
     return (
         <div
+            key={props.id}
             id={props.id}
             onClick={() => props.onClick!(props.id!)}
             className={`group cursor-pointer w-full h-12 px-4 flex flex-row justify-between items-center ${isSelected?'bg-action-selected text-action-active':''} hover:bg-action-hover`}>
@@ -18,7 +19,7 @@ export const  SelectableFullWidthButton: React.FC<ISelectableButtonProps> = (pro
 }
 
 export const FullWidthNavLink: React.FC<INavLinkProps> = (props) => {
-    const classes = "group cursor-pointer w-full h-12 px-4 flex flex-row justify-between items-center hover:bg-action-hover"
+    const classes = `group cursor-pointer w-full h-12 px-4 flex ${props.iconPos === 'right'?'flex-row-reverse':'flex-row'} justify-between items-center hover:bg-action-hover`
     const activeClasses = `${classes} bg-action-selected text-action-active`
     return (
         <NavLink

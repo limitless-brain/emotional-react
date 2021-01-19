@@ -1,7 +1,17 @@
 import {scaleLinear, select, selectAll, Selection} from 'd3';
 import React, {useEffect, useRef, useState} from 'react';
 import {useResizeObserver} from "../../utils/Utils";
-import {anger, disgust, fear, joy, neutral, sadness, surprise} from "../../providers/emotion/EmotionProvider";
+import {
+    anger,
+    disgust,
+    EMOTION_TEXT_COLOR,
+    fear,
+    joy,
+    neutral,
+    sadness,
+    surprise
+} from "../../providers/emotion/emotions";
+import {useEmotion} from "../../providers/emotion/EmotionProvider";
 
 const data = [
     sadness,
@@ -13,7 +23,7 @@ const data = [
     neutral
 ]
 
-function EmotionsCircle() {
+const EmotionsCircle: React.FC = () => {
 
     const svgRef = useRef(null)
 
@@ -22,6 +32,21 @@ function EmotionsCircle() {
     const dimensions = useResizeObserver(rootRef)
 
     const [selection, setSelection] = useState<null | Selection<null, unknown, null, undefined>>(null)
+
+    const [firstTime, setFirstTime] = useState(true)
+
+    const emotion = useEmotion()
+
+    const clear = (selection: Selection<null, unknown, null, undefined>) => {
+        // clear svg
+        selection.select('g').remove()
+        selection.select('defs').remove()
+    }
+
+    useEffect(() => {
+        // whenever a dimension change, redraw
+        setFirstTime(true)
+    },[dimensions])
 
     useEffect(() => {
 
@@ -32,13 +57,9 @@ function EmotionsCircle() {
 
         // if there is no selection
         if (!selection) {
-            // set it to currnet ref
+            // set it to current ref
             setSelection(select(svgRef.current))
         } else {
-
-            // clear svg
-            selection.select('g').remove()
-            selection.select('defs').remove()
 
             // required values
             // max, min dimensions
@@ -64,7 +85,6 @@ function EmotionsCircle() {
                 .domain([-1.5, 1.5])
                 .range([-outerRing, outerRing])
 
-
             const circleMouseEnter = (event: any, data: any) => {
                 selectAll('.flyCircle')
                     .filter(datum => datum === data)
@@ -81,7 +101,6 @@ function EmotionsCircle() {
                     .attr('r', rad)
             }
 
-
             // enter transition
             const enter = () => {
 
@@ -89,24 +108,10 @@ function EmotionsCircle() {
 
                 // all labels
                 let labels = selectAll('.label')
-                    // add events
-                    .on('mouseenter', circleMouseEnter)
-                    .on('mouseleave', circleMouseLeave)
-                    .on('click', exit)
 
                 let duration = 1000, delay = 50
 
-                // // the selected circle
-                // let selected = circles.filter((datum: any) => datum === d)
-                //
-                // // other circles
-                // let others = circles.filter((datum: any) => datum !== d)
-
                 circles
-                    // add events
-                    .on('mouseenter', circleMouseEnter)
-                    .on('mouseleave', circleMouseLeave)
-                    .on('click', exit)
                     .transition('outward')
                     .duration(duration).delay((_, i) => i * delay)
                     .attr('cx', (d: any) => {
@@ -126,6 +131,18 @@ function EmotionsCircle() {
                         labels
                             .transition()
                             .attr('opacity', 1)
+                            .on('end', () => {
+                                labels
+                                    // add events
+                                    .on('mouseenter', circleMouseEnter)
+                                    .on('mouseleave', circleMouseLeave)
+                                    .on('click', exit)
+                            })
+                        circles
+                            // add events
+                            .on('mouseenter', circleMouseEnter)
+                            .on('mouseleave', circleMouseLeave)
+                            .on('click', exit)
                     })
             }
 
@@ -185,7 +202,6 @@ function EmotionsCircle() {
 
                 // selected circle transition
                 selected
-                    .on('click', enter)
                     // start the transition
                     .transition()
                     .duration(duration)
@@ -198,11 +214,47 @@ function EmotionsCircle() {
                         selected
                             // do another transition
                             .transition()
-                            .duration(duration/2)
+                            .duration(duration / 2)
                             // fill the whole screen
                             .attr('r', max)
+                            .on('end', () => {
+                                selected
+                                    .on('click', enter)
+                                // switch emotion
+                                if (emotion?.current !== d.data) {
+                                    emotion?.switchEmotion(d.data)
+                                }
+                            })
                     })
+
             }
+
+            // drawing emotions
+            let steps = data.length - 1
+
+            // mapping data to circle form
+            const mappedData = data.map((d, i) => {
+                return {
+                    data: d,
+                    // if neutral, pos will be 0
+                    pos: d === neutral ? 0 : (i / steps) * (2 * Math.PI)
+                }
+            })
+
+            // not the first time
+            if (!firstTime) {
+                // check if emotion is null
+                if (!emotion?.current) {
+                    // call enter
+                    enter()
+                }
+                return;
+            } else {
+                setFirstTime(false)
+            }
+
+            // clear canvas
+            clear(selection)
 
             // root group
             const group = selection
@@ -244,19 +296,6 @@ function EmotionsCircle() {
                 .attr('in2', 'gooey')
                 .attr('operator', 'atop')
 
-            // drawing emotions
-            let steps = data.length - 1
-
-
-            // mapping data to circle form
-            const mappedData = data.map((d, i) => {
-                return {
-                    data: d,
-                    // if neutral, pos will be 0
-                    pos: d === neutral ? 0 : (i / steps) * (2 * Math.PI)
-                }
-            })
-
             // select all flyCircle
             filterGroup.selectAll('.flyCircle')
                 // provide data and map it to its position
@@ -268,6 +307,7 @@ function EmotionsCircle() {
                 .attr('r', rad)
                 .style('fill', d => d.data.color)
 
+            // labels
             group.selectAll('.label')
                 .data(mappedData)
                 .join('text')
@@ -281,32 +321,26 @@ function EmotionsCircle() {
                         return 0
                     return outerRingScale(Math.sin(d.pos))
                 })
-                .attr('class', 'label select-none font-semibold text-sm md:text-xl uppercase')
-                .attr('fill', '#424242')
+                .attr('class', 'label select-none font-bold text-sm lg:text-xl uppercase')
+                .attr('fill', EMOTION_TEXT_COLOR)
                 .attr('text-anchor', 'middle')
                 .attr('alignment-baseline', 'center')
                 .attr('opacity', 0)
                 .text(d => d.data.name)
-                .call(enter)
-
-            // filterGroup.selectAll('.centerCircle')
-            //     .data([neutral])
-            //     .join('circle')
-            //     .attr('class', 'centerCircle')
-            //     .attr('cx', 0)
-            //     .attr('cy', 0)
-            //     .attr('r', rad)
-            //     .style('fill', d => d.color)
-            //     .call(enter)
-            //     .on('click', exit)
+            if (!emotion?.current)
+                group.call(enter)
+            else
+                exit(null, mappedData.find(d => d.data === emotion.current))
         }
-
-    }, [dimensions, selection])
+    }, [dimensions, selection, emotion?.current, firstTime])
 
     return (
         <div
             ref={rootRef}
-            className="absolute h-screen w-screen flex justify-center items-center transition-all duration-500"
+            style={{
+                zIndex: emotion?.current ? -1 : 'inherit'
+            }}
+            className="absolute h-full w-full flex justify-center items-center transition-all duration-500"
             id="emotion_circle">
             <svg ref={svgRef} className='h-full w-full'/>
         </div>

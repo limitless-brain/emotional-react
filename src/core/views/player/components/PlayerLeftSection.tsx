@@ -25,9 +25,7 @@ const PlayerLeftSection: React.FC = () => {
     // handle on previous click
     const onPreviousClick = () => {
         // check if there is a previous track
-        if (false) {
-            // play previous track
-        } else {
+        if (player.playPrevious() === -1) {
             // notify the user
             nProvider.notify('There is no previous track', "info")
         }
@@ -36,9 +34,7 @@ const PlayerLeftSection: React.FC = () => {
     // handle on next click
     const onNextClick = () => {
         // check if there is a next track
-        if (false) {
-            // play next track
-        } else {
+        if (player.playNext() === -1) {
             // notify the user
             nProvider.notify('There is no next track', "info")
         }

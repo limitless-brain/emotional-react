@@ -7,7 +7,7 @@ import firebase from "firebase";
 import {DEBUG, XSRF_COOKIE} from "../config";
 
 export interface ISignUpCred {
-    username: string,
+    name: string,
     email: string,
     password: string,
     password_confirmation: string,
@@ -38,7 +38,8 @@ const authContext = createContext({} as IAuthContext)
 
 
 // initialize firebase app
-if (firebase.apps.length < 1)
+if (!firebase.apps.length) {
+
     firebase.initializeApp({
         apiKey: "AIzaSyD31JH1yv_7AwSA2hEqJsRIu9mohsHH-Ic",
         authDomain: "sincere-night-252015.firebaseapp.com",
@@ -49,6 +50,10 @@ if (firebase.apps.length < 1)
         measurementId: "G-MBB542LN8H"
     })
 
+    // get the Analytics service for the default app
+    firebase.analytics()
+}
+
 function useAuthProvider() {
 
     const [user, setUser] = useState({} as IUser)
@@ -56,9 +61,6 @@ function useAuthProvider() {
     const [cookie, , removeCookie] = useCookies()
 
     const nProvider = useNotification()
-
-    // user.isLogin = cookie['XSRF-TOKEN'] !== undefined
-    // setUser({...user})
 
     axios.interceptors.response.use(undefined, error => {
         if (error.response) {
@@ -68,17 +70,59 @@ function useAuthProvider() {
                 // unauthorized, make sure we don't have access token
                 if (cookie[XSRF_COOKIE]) {
                     removeCookie(XSRF_COOKIE)
+                    window.location.reload()
                 }
             }
         }
         return Promise.reject(error)
     })
 
+    const createFirebaseAccount = async (credentials: ISignUpCred) => {
+
+        // hold credentials in case the promise takes a long time
+        // and the component unmounted
+        const fbCred = {...credentials}
+
+        return new Promise(() => {
+            firebase.auth()
+                .createUserWithEmailAndPassword(fbCred.email, fbCred.password)
+                .then(fbUser => {
+
+                    // get user object
+                    let userRef = firebase.auth().currentUser
+
+                    // update the profile
+                    userRef?.updateProfile({displayName: fbCred.name})
+                        .then(() => {
+                            // add record to firestore with user information
+                            firebase.firestore().collection('users')
+                                .doc(fbUser.user?.uid).set({
+                                uid: fbUser.user?.uid,
+                                email: fbUser.user?.email,
+                                emailVerified: fbUser.user?.emailVerified,
+                                name: fbCred.name,
+                                photo: fbUser.user?.photoURL
+                            })
+                                .then()
+                                .catch(error => {
+                                    console.log(`write document error: ${error.response}`)
+                                })
+
+                        }, error => {
+                            console.log(`update profile error: ${error.response}`)
+                        })
+                }).catch(error => {
+
+                console.log(`create account error: ${error}`)
+            })
+        })
+    }
+
     const signup = async (credentials: ISignUpCred) => {
         return await Api.auth.signup(credentials)
             .then(resp => {
                 user.isSignUp = true
-                nProvider.notify("Successfully signed up.", "success")
+                createFirebaseAccount(credentials)
                 return resp
             })
             .catch(e => {
@@ -98,6 +142,14 @@ function useAuthProvider() {
                 if (DEBUG)
                     console.log(resp.data)
                 user.isLogin = true
+
+                if (firebase.auth().currentUser === null)
+                    firebase.auth().signInWithEmailAndPassword(credentials.email, credentials.password)
+                        .then()
+                        .catch(error => {
+                            console.log(error)
+                        })
+
                 getProfile().then()
                 return resp
             })
@@ -118,6 +170,7 @@ function useAuthProvider() {
     }
 
     const getProfile = (id?: string, notify = true) => {
+
         return Api.auth.profile(id)
             .then(resp => {
                 if (DEBUG)
@@ -146,6 +199,7 @@ function useAuthProvider() {
                     console.log(resp.data)
                 user.isLogin = false
                 removeCookie(XSRF_COOKIE)
+                firebase.auth().signOut().then()
                 return resp
             })
             .catch(e => {
@@ -160,11 +214,16 @@ function useAuthProvider() {
     }
 
     // one time update
-    useEffect(()=> {
+    useEffect(() => {
         // check if we know login state
-        if(user.isLogin !== (cookie['XSRF-TOKEN'] !== undefined)) {
+        if (user.isLogin !== (cookie['XSRF-TOKEN'] !== undefined)) {
             // update the user
             user.isLogin = (cookie['XSRF-TOKEN'] !== undefined)
+
+            // log out from firebase when there is no token
+            if (!user.isLogin)
+                firebase.auth().signOut().then()
+
             setUser({...user})
         }
     }, [cookie, user])
@@ -182,7 +241,7 @@ export const useAuth = () => {
     return useContext(authContext)
 }
 
-export const AuthProvider: React.FC = ({children}) => {
+export const AuthProvider: React.FC = (props) => {
     const auth = useAuthProvider()
-    return (<authContext.Provider value={auth}>{children}</authContext.Provider>)
+    return (<authContext.Provider value={auth}>{props.children}</authContext.Provider>)
 }

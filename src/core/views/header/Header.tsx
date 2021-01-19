@@ -18,8 +18,7 @@ const Header: React.FC = () => {
         <div className="fixed h-12 w-full bg-bg-secondary rounded-b-2xl shadow transition-all duration-500">
             <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-row pl-4 h-12 justify-center items-center rounded-bl-2xl hover:bg-primary transition-all duration-500">
-                    <img src={logo} className="w-6" alt={''}/>
-                    <p className="text-xl text-text-primary font-bold">Emotional</p>
+                    <p className="select-none text-2xl text-text-primary font-bold">Emotional</p>
                 </div>
                 <div className="flex flex-row w-80 divide-x justify-end items-center">
                     <div

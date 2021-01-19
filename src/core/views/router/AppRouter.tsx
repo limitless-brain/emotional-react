@@ -11,7 +11,11 @@ import Player from "../player/Player";
 import Home from "../Home/Home";
 import SignUp from "../auth/signup/SignUp";
 import {CSSTransition, TransitionGroup} from "react-transition-group";
-import EmotionsCircle from "../emotion-circle/EmotionsCircle";
+import Artists from "../artists/Artists";
+import Albums from "../albums/Albums";
+import CurrentQueue from "../current-queue/CurrentQueue";
+import Users from "../users/Users";
+import ChatRoom from "../chats/ChatRoom";
 
 const AppRouter: React.FC = () => {
 
@@ -36,7 +40,7 @@ const AppRouter: React.FC = () => {
     );
 }
 
-const AnimatedRoutes: React.FC<{isLogin: boolean}> = (props) => {
+const AnimatedRoutes: React.FC<{ isLogin: boolean }> = (props) => {
 
     const location = useLocation()
 
@@ -50,13 +54,26 @@ const AnimatedRoutes: React.FC<{isLogin: boolean}> = (props) => {
                     <PrivateRoute path="/signup" condition={!props.isLogin} redirectTo="/">
                         <SignUp/>
                     </PrivateRoute>
+                    <PrivateRoute path="/current-queue" condition={props.isLogin} redirectTo="/login">
+                        <CurrentQueue/>
+                    </PrivateRoute>
                     <PrivateRoute path="/featured" condition={props.isLogin} redirectTo="/login">
-                        <div className="flex flex-row h-full justify-center items-end">
-                            <MiddleSection/>
-                        </div>
+                        <MiddleSection/>
+                    </PrivateRoute>
+                    <PrivateRoute path="/artists" condition={props.isLogin} redirectTo="/login">
+                        <Artists/>
+                    </PrivateRoute>
+                    <PrivateRoute path="/albums" condition={props.isLogin} redirectTo="/login">
+                        <Albums/>
+                    </PrivateRoute>
+                    <PrivateRoute exact path="/users" condition={props.isLogin} redirectTo="/login">
+                        <Users/>
+                    </PrivateRoute>
+                    <PrivateRoute exact path="/chat/:sid/:rid" condition={props.isLogin} redirectTo="/login">
+                        <ChatRoom/>
                     </PrivateRoute>
                     <PrivateRoute exact path="/" condition={props.isLogin} redirectTo="/login">
-                        <EmotionsCircle/>
+                        <Home/>
                     </PrivateRoute>
                 </Switch>
             </CSSTransition>

@@ -2,13 +2,14 @@ import {applyTheme, IThemes} from "./utils";
 import base from "./base";
 import dark from "./dark";
 import React, {createContext, useContext, useState} from "react";
+import {createMuiTheme, MuiThemeProvider, ThemeOptions} from "@material-ui/core";
 
 /**
  * Theme context state blueprint
  *
  */
 interface IThemeContext {
-    name: string
+    name: string,
     switchTheme: Function
 }
 
@@ -78,6 +79,17 @@ export const ThemeProvider: React.FC = ({children}) => {
     // theme provider state object
     const theme = useThemeProvider()
 
+    const themeConfig = createMuiTheme({
+        palette: {
+            primary: {main: '#f6b245'},
+            type: theme.name === 'dark' ? 'dark' : 'light'
+        },
+    })
+
     // return component design
-    return (<themeContext.Provider value={theme}>{children}</themeContext.Provider>)
+    return (
+        <themeContext.Provider value={theme}>
+            <MuiThemeProvider theme={themeConfig}>{children}</MuiThemeProvider>
+        </themeContext.Provider>
+    )
 }
