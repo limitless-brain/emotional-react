@@ -4,7 +4,7 @@ import axios, {AxiosResponse} from "axios";
 import {useNotification} from "./NotificationProvider";
 import {useCookies} from "react-cookie";
 import firebase from "firebase";
-import {DEBUG, XSRF_COOKIE} from "../config";
+import {DEBUG, FIREBASE_INITIALIZE_OPTIONS, XSRF_COOKIE} from "../config";
 
 export interface ISignUpCred {
     name: string,
@@ -40,15 +40,7 @@ const authContext = createContext({} as IAuthContext)
 // initialize firebase app
 if (!firebase.apps.length) {
 
-    firebase.initializeApp({
-        apiKey: "AIzaSyD31JH1yv_7AwSA2hEqJsRIu9mohsHH-Ic",
-        authDomain: "sincere-night-252015.firebaseapp.com",
-        projectId: "sincere-night-252015",
-        storageBucket: "sincere-night-252015.appspot.com",
-        messagingSenderId: "800472623092",
-        appId: "1:800472623092:web:8278619ae666057811fba1",
-        measurementId: "G-MBB542LN8H"
-    })
+    firebase.initializeApp(FIREBASE_INITIALIZE_OPTIONS)
 
     // get the Analytics service for the default app
     firebase.analytics()

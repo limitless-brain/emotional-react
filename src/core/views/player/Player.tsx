@@ -85,6 +85,7 @@ const Player: React.FC = () => {
                         if (e === 150) {
                             Api.youtube.audioFile(player.currentSong?.youtubeId!)
                                 .then(resp => {
+                                    console.log(resp.data.url)
                                     player.load(resp.data.url)
                                 })
                         } else {

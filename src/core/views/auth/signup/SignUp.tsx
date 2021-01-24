@@ -81,7 +81,7 @@ function SignUp() {
                         <input type={"password"}
                                onChange={onChange}
                                className="w-full text-xl font-normal focus:outline-none focus:bg-bg-primary bg-transparent px-4"
-                               name="password_confirmation" placeholder="Repeat Password"
+                               name="password_confirmation" placeholder="Confirm Password"
                                required/>
                     </div>
                     <button
