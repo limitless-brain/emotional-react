@@ -1,46 +1,135 @@
-# Getting Started with Create React App
+# <p align="center">Emotional ReactJS</p>
+# <p align="center">![Emotional API](logo.png)</p>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+--------
 
-## Available Scripts
+# About Emotional ReactJS
 
-In the project directory, you can run:
+Emotional ReactJS is a web application written using ReactJS with TypeScript language to communicate with [**Emotional API**](https://github.com/limitless-brain/emotional-backend).
 
-### `yarn start`
+# Getting Started
+### Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Please check the official laravel installation guide for server requirements before you start. [Official Documentation](https://laravel.com/docs/8.x/installation)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Alternative installation is possible without local dependencies relying on [Docker](#docker).
 
-### `yarn test`
+Clone the repository
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+    git clone git@github.com:limitless-brain/emotional-react.git
 
-### `yarn build`
+Switch to the repo folder
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    cd emotional-react
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Install all the dependencies using yarn
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    yarn install
 
-### `yarn eject`
+Copy the example config file and make the required [**configuration**](#configuration-file) changes in the config.ts file
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    cp src/core/example.config.ts config.ts
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+generate development css for tailwind
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+    yarn postcss
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Start the local development server
 
-## Learn More
+    yarn start
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+You can now access the server at http://localhost:3000
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**TL;DR command list**
+
+    git clone git@github.com:limitless-brain/emotional-react.git
+    cd emotional-react
+    yarn install
+    cp src/core/example.config.ts config.ts
+    yarn postcss
+    yarn start
+
+### Firebase
+To start you must have firebase account with a new project in order to use collaborate, invite and chat functionalities.
+For more information about obtaining web configuration refer to [**official documentation**](https://firebase.google.com/docs/web/setup#config-object).
+
+### Configuration file
+
+```typescript jsx
+
+/**
+ * Backend base url
+ *
+ */
+export const BASE_URL = 'your_backend_url'
+
+/**
+ * Frontend base url
+ *
+ */
+export const ORIGIN_BASE_URL = 'your_frontend_url'
+
+/**
+ * Disable/Enable console logs
+ *
+ */
+export const DEBUG = false;
+
+/**
+ * XSRF Token Cookie name
+ *
+ */
+export const XSRF_COOKIE = 'XSRF-TOKEN'
+
+/**
+ * Youtube video url
+ *
+ */
+export const YOUTUBE_VIDEO = 'https://www.youtube.com/watch?v='
+
+/*
+ * Firebase initialize options
+ *
+ * Please replace it with your own firebase project setup
+ */
+export const FIREBASE_INITIALIZE_OPTIONS = {
+    apiKey: "your_api_key",
+    authDomain: "your.firebaseapp.com",
+    projectId: "your_project_id",
+    storageBucket: "your.appspot.com",
+    messagingSenderId: "your_app_messaging_id",
+    appId: "your_app_id",
+    measurementId: "your_measurement_id"
+}
+```
+
+# Functionality Overview
+Emotional is music player which utilize youtube embedding functionality to play
+the songs, if the song is not embeddable the video will be downloaded, and a link will be provided via Emotional API.
+
+Feel free to explore the project.
+
+## General Functionality
+* Authenticate users via Passport (login/signup pages + logout button on user panel)
+* Artists
+* Albums
+* Featured
+* Search
+* User Interactions
+* Playlists
+
+## The general page breakdown looks like this:
+
+* Home page (URL: / )
+  * The Wheel Of The Primary Emotions
+  * List of preset playlists
+* Sign in/Sign up pages (URL: /login, /signup )
+  * Use Passport (receive the cookie inside login response)
+* Artists page (URL: /artists )
+* Albums page (URL: /albums )
+* Featured page (Url: /featured)
+* ~~Search page (Url: /search?query)~~ removed
+* Chat page (url: /chat/room-id)
+* User page (url: /users)
+
+# ![Emotional](src/core/providers/emotion/assets/joy_sadness.png)
