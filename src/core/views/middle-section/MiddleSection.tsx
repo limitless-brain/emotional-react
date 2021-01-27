@@ -4,7 +4,8 @@ import {usePlayer} from "../../providers/player/PlayerProvider";
 import {BUTTON_TAILWIND_STYLE, getYoutubeVideoId} from "../../utils/Utils";
 import {DEBUG, YOUTUBE_VIDEO} from "../../config";
 import {ISong} from "../../providers/player/blueprint";
-import { emotions } from '../../providers/emotion/emotions';
+import {emotions} from '../../providers/emotion/emotions';
+import Loading from "../loading/Loading";
 
 interface IYoutubeVideo {
     etag: string,
@@ -51,6 +52,14 @@ export const SongItem: React.FC<ISong> = (props) => {
 
     const playingVideoId = getYoutubeVideoId(player.state.url)
 
+    const [loading, setLoading] = useState(false)
+
+    const [emotionsResponse, setEmotionsResponse] = useState<any>()
+
+    const [lyricsResponse, setLyricsResponse] = useState<any>()
+
+    const [error, setError] = useState(false)
+
     const onPlayClick = () => {
         if (playingVideoId !== props.youtubeId) {
             player.play(props)
@@ -60,10 +69,40 @@ export const SongItem: React.FC<ISong> = (props) => {
     }
 
     const requestEmotion = async () => {
-        await Api.youtube.videoInfo(props.youtubeId).then(resp => {
-            console.log(resp)
+        await Api.youtube.lyrics(props.youtubeId).then(resp => {
+            setLyricsResponse(resp.data)
+            if (resp.data.lyrics !== 'lyrics not found') {
+                Api.ai.predictEmotion(resp.data.lyrics).then(aiResp => {
+                        setEmotionsResponse(aiResp.data)
+                    }
+                )
+            } else {
+                setError(true)
+            }
+            setLoading(false)
         })
+            .catch(err => {
+                setError(true)
+            })
     }
+
+    const generateEmotionsChips = () => {
+
+        const emotions = emotionsResponse.result.labels
+        const scores = emotionsResponse.result.overall
+
+        return emotions.map((emotion: string, index: number) => (<div
+            className="flex flex-row w-24 h-6 text-xs font-normal uppercase tracking-wider shadow p-1 rounded-2xl justify-center items-center mb-2">
+            <p className="text-text-primary opacity-80">{`${emotion} ${scores[index]}`}%</p>
+        </div>))
+    }
+
+    useEffect(() => {
+        if (!loading && !emotionsResponse) {
+            requestEmotion()
+            setLoading(true)
+        }
+    }, [loading])
 
     return (
         <div id={`song-control-${props.youtubeId}`}
@@ -97,10 +136,9 @@ export const SongItem: React.FC<ISong> = (props) => {
                             </div>
                         </div>
                         <div className="mt-6 pt-6 text-text-primary space-x-2 flex flex-wrap border-t">
-                            {emotions.map( emotion => (<div
-                                className="flex flex-row w-24 h-6 text-xs font-normal uppercase tracking-wider shadow p-1 rounded-2xl justify-center items-center mb-2">
-                                <p className="text-text-primary opacity-80">{`${emotion.name} ${(Math.random() * 100).toFixed(0)}`}%</p>
-                            </div>)) }
+                            {error &&('There is no lyrics for this song')}
+                            {loading && (<Loading/>)}
+                            {emotionsResponse && generateEmotionsChips()}
                         </div>
                     </div>
                 </div>
